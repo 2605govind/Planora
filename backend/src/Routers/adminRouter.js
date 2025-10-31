@@ -12,8 +12,8 @@ adminRouter.put('/products/:productId', updateProduct);
 adminRouter.delete('/product/:productId', deleteProduct);        
 
 // plan
-adminRouter.post('/plan', createBillingPlan);        
-adminRouter.patch('/plan/:id', updatePlan);        
-adminRouter.delete('/plans/:id', deactivatePlan);        
+// adminRouter.post('/plan', createBillingPlan);        
+// adminRouter.patch('/plan/:id', updatePlan);        
+// adminRouter.delete('/plans/:id', deactivatePlan);        
 
 export default adminRouter;

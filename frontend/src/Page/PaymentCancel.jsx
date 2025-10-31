@@ -13,32 +13,41 @@ export default function PaymentCancel() {
 
   useEffect(() => {
     const token = searchParams.get('token');
+    const mode = searchParams.get('mode');
 
-    if (!token) {
-      setError('Missing token in query params.');
-      setLoading(false);
-      return;
+
+
+    if (mode === "order") {
+      if (!token) {
+        setError('Missing token in query params.');
+        setLoading(false);
+        return;
+      }
+      axiosInstance
+        .get(`/api/paypal/orders/cancel`, {
+          params: { token },
+        })
+        .then((response) => {
+          console.log('Backend cancel response:', response.data);
+          setStatus('Payment has been cancelled successfully.');
+          setLoading(false);
+
+          // Redirect to home after 3 seconds
+          setTimeout(() => {
+            navigate('/');
+          }, 3000);
+        })
+        .catch((err) => {
+          console.error('Error cancelling payment:', err);
+          setError('There was an error processing the cancellation.');
+          setLoading(false);
+        });
+
+    } else if (mode === "subscriptions") {
+      console.log("failed")
     }
 
-    axiosInstance
-      .get(`/api/paypal/cancel-order`, {
-        params: { token },
-      })
-      .then((response) => {
-        console.log('Backend cancel response:', response.data);
-        setStatus('Payment has been cancelled successfully.');
-        setLoading(false);
 
-        // Redirect to home after 3 seconds
-        setTimeout(() => {
-          navigate('/');
-        }, 3000);
-      })
-      .catch((err) => {
-        console.error('Error cancelling payment:', err);
-        setError('There was an error processing the cancellation.');
-        setLoading(false);
-      });
   }, [searchParams, navigate]);
 
   if (error) {

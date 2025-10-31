@@ -29,8 +29,8 @@ export async function createOrder(amount) {
       intent: "CAPTURE",
       purchase_units: [{ amount: { currency_code: "USD", value: amount } }],
       application_context: {
-        return_url: "http://localhost:5173/payment/success",
-        cancel_url: "http://localhost:5173/payment/cancel",
+        return_url: "http://localhost:5173/payment/success?mode=orders",
+        cancel_url: "http://localhost:5173/payment/cancel?mode=orders",
         shipping_preference: 'NO_SHIPPING',
         user_action: 'PAY_NOW',
         brand_name: 'planora.io'
@@ -125,6 +125,8 @@ export async function showBillingPlanDetailsService(productId) {
   return response.data
 }
 
+
+
 export async function createBillingPlanService(plan) {
   const token = await generateAccessToken();
 
@@ -136,10 +138,12 @@ export async function createBillingPlanService(plan) {
       'Content-Type': 'application/json'
     },
     data: {
-      name: "My Product",
-      description: "Sample product",
+      name: plan.name,
+      description: plan.description,
       type: "SERVICE",
-      category: "SOFTWARE"
+      category: "SOFTWARE",
+      creditsPerMonth: plan.creditsPerMonth,
+      planType: plan.planType,
     }
   });
   const productId = productRes.data.id;
@@ -192,62 +196,48 @@ export async function createBillingPlanService(plan) {
   return res.data;
 }
 
-export async function createPlanSubscription(body) {
+export async function createPlanSubscriptionService(planId) {
+  const token = await generateAccessToken();
+  const body = {
+    plan_id: planId, 
+    application_context: {
+      brand_name: "planora.io",
+      user_action: "SUBSCRIBE_NOW",
+      return_url: "http://localhost:5173/payment/success?mode=subscriptions",
+      cancel_url: "http://localhost:5173/payment/cancel?mode=subscriptions",
+      shipping_preference: 'NO_SHIPPING',
+    },
+  };
+
+  const res = await axios.post(
+    `${BASE}/v1/billing/subscriptions`,
+    body,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+
+  return res.data;
+}
+
+
+export async function deactivatePlanService(planId) {
   const token = await generateAccessToken();
 
-  const res = axios({
-    url: `${BASE}v1/billing/subscriptions`,
+  const res = await axios({
+    url: `${BASE}v1/billing/plans/${planId}/deactivate`,
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
       'Prefer': 'return=representation'
     },
-    data: JSON.stringify({
-      "plan_id": body.plan_id,
-      "start_time": body.start_time,
-      "quantity": "1",
-      "shipping_amount": {
-        "currency_code": "USD",
-        "value": body.price
-      },
-      "subscriber": {
-        // "name": {
-        //   "given_name": "John",
-        //   "surname": "Doe"
-        // },
-        // "email_address": "customer@example.com",
-        "shipping_address": {
-          "name": {
-            // "full_name": "John Doe"
-            "username": body.username
-          },
-          // "address": {
-          //   "address_line_1": "2211 N First Street",
-          //   "address_line_2": "Building 17",
-          //   "admin_area_2": "San Jose",
-          //   "admin_area_1": "CA",
-          //   "postal_code": "95131",
-          //   "country_code": "US"
-          // }
-        }
-      },
-      "application_context": {
-        "brand_name": "planora",
-        "locale": "en-US",
-        "shipping_preference": "SET_PROVIDED_ADDRESS",
-        "user_action": "SUBSCRIBE_NOW",
-        "payment_method": {
-          "payer_selected": "PAYPAL",
-          "payee_preferred": "IMMEDIATE_PAYMENT_REQUIRED"
-        },
-        "return_url": "https://localhost:5173/subscription/returnUrl",
-        "cancel_url": "https://localhost:5173/subscription/cancelUrl"
-      }
-    })
+    data: {}
   })
-
-  return res.data;
 }
 
 
@@ -308,3 +298,5 @@ export async function listSubscriptionService(body) {
 
   return res.data;
 }
+
+

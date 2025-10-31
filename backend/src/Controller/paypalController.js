@@ -79,6 +79,8 @@ export const completePayPalOrder = async (req, res) => {
 
 export const handlePayPalWebhook = async (req, res) => {
   try {
+
+    console.log("me chal rha hu")
     const rawBody = req.body;
 
     // verify karo
@@ -97,9 +99,7 @@ export const handlePayPalWebhook = async (req, res) => {
       const orderId = resource.id;
       const payerEmail = resource?.payer?.email_address;
 
-      const transaction = await Transaction.findOne({
-        where: { paypalOrderId: orderId },
-      });
+      const transaction = await Transaction.findOne({where: { paypalOrderId: orderId }});
 
       if (!transaction) {
         console.log("Transaction not found:", orderId);
@@ -118,6 +118,10 @@ export const handlePayPalWebhook = async (req, res) => {
         await user.save();
       }
 
+      const pendingtransactions = await Transaction.destroy({
+        where: { userId: user.id, status: 'PENDING' }
+      });
+      
       console.log(`webhook ${payerEmail} upgraded to ${plan.name}`);
     }
 

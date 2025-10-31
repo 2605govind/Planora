@@ -14,45 +14,29 @@ import ProfilePage from './Page/ProfilePage.jsx'
 import AdminPage from './Page/AdminPage.jsx'
 import PaymentSuccess from './Page/PaymentSuccess.jsx'
 import PaymentCancel from './Page/PaymentCancel.jsx'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 function App() {
   const dispatch = useDispatch();
   const { isLoading, authUser } = useSelector((s) => s.gloable);
   const isAuth = Boolean(authUser);
-
-
-  // useEffect(() => {
-  //   const fetchAuthUser = async () => {
-
-  //     try {
-  //       const res = await axiosInstance.get('/api/user');
-  //       console.log(res.data.user)
-  //       dispatch(setAuthUser(res.data.user));
-  //     } catch (error) {
-  //       console.log('Error fetching user:', error);
-  //     }
-
-  //   };
-
-  //   fetchAuthUser();
-  // }, []);
-
+  const queryClient = new QueryClient();
 
   return (
-    <div>
-      <ToastContainer position="top-right" autoClose={3000} theme="dark" />
-      <Routes>
-        <Route path='/register' element={isAuth ? <HomePage /> : <RegisterPage />}></Route>
-        <Route path='/login' element={isAuth ? <HomePage /> : <LoginPage />}></Route>
-        <Route path='/profile' element={isAuth ? <ProfilePage /> : <HomePage />}></Route>
-        <Route path='/admin' element={isAuth ? (authUser.role === "admin") ? <AdminPage /> : <HomePage /> : <HomePage />}></Route>
-        <Route path="/payment/success" element={ isAuth ? <PaymentSuccess /> : <HomePage /> } />
-        <Route path="/payment/cancel" element={isAuth ? <PaymentCancel /> : <HomePage />} />
-        <Route path='/' element={ <HomePage /> }></Route>
-
-        {/* <Route path='/' element={isAuth ? <HomePage /> : <LoginPage />}></Route> */}
-      </Routes>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <div>
+        <ToastContainer position="top-right" autoClose={3000} theme="dark" />
+        <Routes>
+          <Route path='/register' element={isAuth ? <HomePage /> : <RegisterPage />}></Route>
+          <Route path='/login' element={isAuth ? <HomePage /> : <LoginPage />}></Route>
+          <Route path='/profile' element={isAuth ? <ProfilePage /> : <HomePage />}></Route>
+          <Route path='/admin' element={isAuth ? (authUser.role === "admin") ? <AdminPage /> : <HomePage /> : <HomePage />}></Route>
+          <Route path="/payment/success" element={isAuth ? <PaymentSuccess /> : <HomePage />} />
+          <Route path="/payment/cancel" element={isAuth ? <PaymentCancel /> : <HomePage />} />
+          <Route path='/' element={<HomePage />}></Route>
+        </Routes>
+      </div>
+    </QueryClientProvider>
   )
 }
 

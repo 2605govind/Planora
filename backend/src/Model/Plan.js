@@ -11,6 +11,24 @@ Plan.init(
       primaryKey: true,
     },
 
+    productId: {
+      type: DataTypes.STRING(200),
+      allowNull: false,
+      unique: true,
+      validate: {
+        notEmpty: true,
+      },
+    },
+
+    planId: {
+      type: DataTypes.STRING(200),
+      allowNull: false,
+      unique: true,
+      validate: {
+        notEmpty: true,
+      },
+    },
+
     name: {
       type: DataTypes.STRING(50),
       allowNull: false,

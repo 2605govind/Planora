@@ -21,11 +21,11 @@ export default function ProductCard({ product, onEdit , setIsDeleted}) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between hover:shadow-lg transition-all">
+    <div className="border rounded-lg shadow-md p-4 flex flex-col justify-between hover:shadow-lg transition-all">
       <div>
-        <h3 className="text-lg font-semibold mb-2 text-gray-800">{product.name}</h3>
-        <p className="text-gray-700 mb-1">Credits: {product.price}</p>
-        <p className="text-gray-700 mb-1">inventory: {product.inventory_count}</p>
+        <h3 className="text-lg font-semibold mb-2 text-gray-300">{product.name}</h3>
+        <p className="text-gray-500 mb-1">Credits: {product.price}</p>
+        <p className="text-gray-500 mb-1">inventory: {product.inventory_count}</p>
 
       </div>
 

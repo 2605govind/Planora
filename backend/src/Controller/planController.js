@@ -1,11 +1,11 @@
+import Transaction from '../Model/Transaction.js'
 import Plan from '../Model/Plan.js';
-import { createBillingPlanService, allBillingPlansService, showBillingPlanDetailsService } from '../services/planService.js';
+import { createBillingPlanService, createPlanSubscriptionService, deactivatePlanService, showBillingPlanDetailsService } from '../services/planService.js';
 
 // create plan in paypal /admin
 export const createBillingPlan = async (req, res) => {
   try {
     const { name, description, price, creditsPerMonth, planType } = req.body;
-
 
     if (!name || !description || !price || !creditsPerMonth) {
       return res.status(400).json({
@@ -14,19 +14,51 @@ export const createBillingPlan = async (req, res) => {
       });
     }
 
+    const existing = await Plan.findOne({ where: { name } });
+    if (existing) {
+      return res.status(400).json({ message: 'Plan with this name already exists' });
+    }
 
-    // const existing = await Plan.findOne({ where: { name } });
-    // if (existing) {
-    //   return res.status(400).json({ message: 'Plan with this name already exists' });
-    // }
-    // const plan = await Plan.create({
-    //   name,
-    //   description,
-    //   price,
-    //   creditsPerMonth,
-    //   planType,
-    // });
+    const planData = {
+      name: name?.toLowerCase().trim(),
+      description: description.trim(),
+      price,
+      creditsPerMonth,
+      planType: planType?.toUpperCase().trim(),
+    };
 
+    const serviceData = await createBillingPlanService(planData);
+    console.log(serviceData)
+
+    planData.productId = serviceData.product_id;
+    planData.planId = serviceData.id;
+
+    const createdPlan = await Plan.create(planData)
+
+    res.status(201).json({
+      success: true,
+      message: 'Plan subscription created successfully',
+      plan: { ...serviceData, ...createdPlan }
+    });
+
+  } catch (error) {
+    console.log('Create Plan Error:', error);
+    res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+  }
+};
+
+// todo
+// update plan in paypal /admin
+export const updateBillingPlan = async (req, res) => {
+  try {
+    const { name, description, price, creditsPerMonth, planType } = req.body;
+
+    if (!name || !description || !price || !creditsPerMonth) {
+      return res.status(400).json({
+        success: false,
+        message: "All feild are required",
+      });
+    }
 
     const plan = {
       name,
@@ -36,80 +68,50 @@ export const createBillingPlan = async (req, res) => {
       planType,
     };
 
-    const data = await createBillingPlanService(plan);
-    console.log(data);
-
-
     res.status(201).json({
       success: true,
       message: 'Plan subscription created successfully',
       subscription: data
     });
   } catch (error) {
-    console.log('Create Plan Error:', error);
+    console.log('updateSubscriptionPlan Error:', error);
     res.status(500).json({ success: false, message: 'Server Error', error: error.message });
   }
 };
 
-// todo
+
 // update plan in paypal /admin
-// export const updateSubscriptionPlan = async (req, res) => {
-//   try {
-//     const { name, description, price, creditsPerMonth, planType } = req.body;
+export const deactivateBillingPlan = async (req, res) => {
+  const { planId } = req.params
+  try {
+    await deactivatePlanService(planId);
+
+    res.status(201).json({
+      success: true,
+      message: 'Plan deactivate successfully',
+    });
+  } catch (error) {
+    console.log('deactivateBillingPlan Error:', error);
+    res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+  }
+};
 
 
-//     if (!name || !description || !price || !creditsPerMonth) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "All feild are required",
-//       });
-//     }
-
-
-//     // const existing = await Plan.findOne({ where: { name } });
-//     // if (existing) {
-//     //   return res.status(400).json({ message: 'Plan with this name already exists' });
-//     // }
-//     // const plan = await Plan.create({
-//     //   name,
-//     //   description,
-//     //   price,
-//     //   creditsPerMonth,
-//     //   planType,
-//     // });
-
-
-//     const plan = {
-//       name,
-//       description,
-//       price,
-//       creditsPerMonth,
-//       planType,
-//     };
-
-
-
-//     res.status(201).json({
-//       success: true,
-//       message: 'Plan subscription created successfully',
-//       subscription: data
-//     });
-//   } catch (error) {
-//     console.log('updateSubscriptionPlan Error:', error);
-//     res.status(500).json({ success: false, message: 'Server Error', error: error.message });
-//   }
-// };
 
 
 // get all plans from paypal | user/admin
 export const getAllBillingPlans = async (req, res) => {
   try {
-    const allPlan = await allBillingPlansService();
-    console.log(allPlan)
+    const plans = await Plan.findAll({
+      order: [
+        ['name', 'ASC']
+      ]
+    });
+
     res.status(201).json({
       success: true,
       message: 'Get all plans successfully',
-      plans: allPlan
+      plans: plans
     });
   } catch (error) {
     console.log('getAllSubscriptionPlans Error:', error);
@@ -140,28 +142,51 @@ export const getBillingPlanDetails = async (req, res) => {
   }
 }
 
-export const createPlanSubscription = async (req, res) => {
-  
-  try {
-    const {} = req.body;
 
-    if (!productId) {
-      return res.status(400).json({
-        success: false,
-        message: "productId feild is required",
-      });
-    }
+
+
+export const createPlanSubscription = async (req, res) => {
+
+  const { planId } = req.params;
+  try {
+
+
+    console.log("planId", planId)
+    const data = await createPlanSubscriptionService(planId)
+
+    await Transaction.create({
+      userId: req.user.id,
+      planId: req.body.id,
+      amount: req.body.price,
+      status: "PENDING",
+      paypalOrderId: data.id,
+    });
 
     res.status(201).json({
       success: true,
       message: 'successfully',
-
+      data
     });
   } catch (error) {
     console.log('createPlanSubscription Error:', error);
     res.status(500).json({ success: false, message: 'Server Error', error: error.message });
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

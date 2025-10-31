@@ -4,41 +4,54 @@ import axiosInstance from '../utils/axiosInstance';
 
 
 export default function PaymentSuccess() {
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const [status, setStatus] = useState('Processing your payment...');
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     const token = searchParams.get('token');
     const payerID = searchParams.get('PayerID');
+    const mode = searchParams.get('mode');
 
-    if (!token || !payerID) {
-      setError('Missing token or PayerID in query params.');
-      setLoading(false);
-      return;
+
+
+
+    if (mode === "order") {
+      if (!token || !payerID) {
+        setError('Missing token or PayerID in query params.');
+        setLoading(false);
+        return;
+      }
+
+      axiosInstance
+        .get(`/api/paypal/orders/complete`, {
+          params: { token, PayerID: payerID },
+        })
+        .then((response) => {
+          console.log('Backend response:', response.data);
+          setStatus('Payment completed successfully!');
+          setLoading(false);
+
+          setTimeout(() => {
+            navigate('/');
+          }, 6000);
+        })
+        .catch((err) => {
+          console.error('Error completing payment:', err);
+          setError('There was an error completing your payment.');
+          setLoading(false);
+        });
+    } else if (mode === "subscriptions") {
+      console.log("succuss")
+      navigate('/');
     }
 
-    axiosInstance
-      .get(`/api/paypal/complete-order`, {
-        params: { token, PayerID: payerID },
-      })
-      .then((response) => {
-        console.log('Backend response:', response.data);
-        setStatus('Payment completed successfully!');
-        setLoading(false);
 
-        setTimeout(() => {
-          navigate('/');
-        }, 3000);
-      })
-      .catch((err) => {
-        console.error('Error completing payment:', err);
-        setError('There was an error completing your payment.');
-        setLoading(false);
-      });
   }, [searchParams, navigate]);
 
   if (error) {

@@ -1,26 +1,30 @@
 import express from "express";
 import {cancelPayPalOrder, completePayPalOrder, createPayPalOrder} from "../Controller/paypalController.js";
-import {capturePayment, createPlanSubscription} from '../services/planService.js'
 import authMiddleware from "../Middleware/authMiddleware.js";
 import adminMiddleware from "../Middleware/adminMiddleware.js";
 import userMiddleware from "../Middleware/userMiddleware.js";
-import { createBillingPlan, getAllBillingPlans, getBillingPlanDetails } from "../Controller/planController.js";
+import { createBillingPlan, getAllBillingPlans, getBillingPlanDetails, updateBillingPlan, createPlanSubscription, deactivateBillingPlan} from "../Controller/planController.js";
 
 const paypalRoutes = express.Router();
 
-paypalRoutes.post("/pay",authMiddleware, createPayPalOrder);
-paypalRoutes.get("/complete-order",authMiddleware, completePayPalOrder);
-paypalRoutes.get("/cancel-order",authMiddleware, cancelPayPalOrder);
+// PayPal Orders
+
+paypalRoutes.post("/orders",authMiddleware, createPayPalOrder);
+paypalRoutes.get("/orders/complete",authMiddleware, completePayPalOrder);
+paypalRoutes.get("/orders/cancel",authMiddleware, cancelPayPalOrder);
 
 
 // Billing plan
-paypalRoutes.post('/createplan', adminMiddleware, createBillingPlan)
-paypalRoutes.get('/getallplans', authMiddleware, getAllBillingPlans)
-paypalRoutes.get('/getplan', authMiddleware, getBillingPlanDetails)
+paypalRoutes.post('/plans', adminMiddleware, createBillingPlan)
+paypalRoutes.patch('/plans', adminMiddleware, updateBillingPlan)
+paypalRoutes.put('/plans/deactivate/:planId', adminMiddleware, deactivateBillingPlan)
+// paypalRoutes.put('/plans/activate/:planId', adminMiddleware, activateBillingPlan)
+paypalRoutes.get('/plans', authMiddleware, getAllBillingPlans)
+paypalRoutes.get('/plans/:planId', authMiddleware, getBillingPlanDetails)
 
 
 // Subsription
-paypalRoutes.post('/createsubscription',userMiddleware , createPlanSubscription)
+paypalRoutes.post('/subscriptions/:planId',userMiddleware , createPlanSubscription)
 
 export default paypalRoutes;
 
