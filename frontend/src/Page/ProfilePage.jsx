@@ -2,11 +2,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axiosInstance from '../utils/axiosInstance.js';
-import { setAuthUser } from '../slice/reduxIGlobleReducer.js';
 import { toast, ToastContainer } from 'react-toastify';
 import { User, CreditCard, Package } from 'lucide-react';
-import Loading from '../components/Loading.jsx'
 import { ClipLoader } from 'react-spinners';
+import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs';
+import LogOut from '../components/header/LogOut.jsx'
+import {usePost} from '../hooks/usePost.js'
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -17,18 +19,31 @@ export default function ProfilePage() {
   const [buyLoading, setBuyLoading] = useState(false);
   const [selectPlan, setSelectPlan] = useState(null);
   const [subscriptionLoading, setSubscriptionLoading] = useState(false);
-  
-  const handleLogout = async () => {
-    try {
-      await axiosInstance.post('/api/auth/logout');
-      dispatch(setAuthUser(null));
-      navigate('/login');
-      toast.success('Logged out successfully!');
-    } catch (error) {
-      toast.error('Logout failed!');
-      console.log('Logout failed:', error);
+
+  const {mutate:refundMutate , isPending: refundRequestPending, error: refundError } = usePost("/api/user/requestforrefund");
+
+
+  const { data: currentPlanDetails, error: currentPlanDetailsError, isLoading: currentPlanDetailsLoading } = useQuery({
+    queryKey: ["fetchCurrentPlanDetails"],
+    queryFn: async () => {
+      if (authUser.role === 'user' && authUser.plan != 'FREE') {
+        try {
+          const response = await axiosInstance.get('/api/user/plans/details');
+          return response.data.plan || [];
+        } catch (error) {
+          console.error("Error fetching plan details:", error);
+          toast.error(error.response?.data?.message || error.message || "Unknown server error");
+          throw new Error(
+            error.response?.data?.message || error.message || "Unknown server error"
+          );
+        }
+      } else {
+        return []
+      }
     }
-  };
+  });
+
+ 
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -43,7 +58,10 @@ export default function ProfilePage() {
         setLoading(false);
       }
     };
+
+
     fetchPlans();
+
   }, []);
 
   const handleBuyPlan = async (planId) => {
@@ -65,7 +83,7 @@ export default function ProfilePage() {
     setSelectPlan(planId);
     setSubscriptionLoading(true)
     try {
-      const res = await axiosInstance.post('/api/paypal/subscriptions/'+billingPlanId, plan);
+      const res = await axiosInstance.post('/api/paypal/subscriptions/' + billingPlanId, plan);
       const approvalUrl = res.data.data.links.find((l) => l.rel === 'approve')?.href;
       console.log(res)
       if (approvalUrl) window.location.href = approvalUrl;
@@ -77,9 +95,30 @@ export default function ProfilePage() {
     setSubscriptionLoading(false)
   };
 
-  // if(loading) {
-  //   return <Loading/>
-  // }
+
+  const handleRequestForRefand = async (currentPlan) => {
+    const orderId = currentPlan.transaction.paypalOrderId;
+    const amount = currentPlan.plan.price;
+    const planId = currentPlan.plan.id;
+    const transactionId = currentPlan.transaction.id;
+    const paymentMethod = currentPlan.transaction.paymentMethod;
+    
+
+    // send request at 
+    // requestforrefund
+    // console.log(currentPlan)
+    if(!refundRequestPending) {
+      refundMutate({orderId, amount, planId, transactionId, paymentMethod});
+      console.log("send")
+    }
+  }
+
+  useEffect(() => {
+    if(refundError) {
+      console.log("refund error ", refundError?.response?.data?.message)
+      toast.error(refundError?.response?.data?.message || "Server Error")
+    }
+  }, [refundError])
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
@@ -97,12 +136,8 @@ export default function ProfilePage() {
               <span className="flex items-center gap-1">
                 <User size={18} /> {authUser.username}
               </span>
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded transition"
-              >
-                Logout
-              </button>
+              <LogOut/>
+  
             </>
           ) : (
             <button
@@ -119,16 +154,95 @@ export default function ProfilePage() {
         {authUser ? (
           <div className="p-6 max-w-6xl mx-auto flex flex-col gap-8">
             {/* Profile Card */}
-            <div className="bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-700 w-full max-w-md">
-              <h2 className="text-xl font-bold mb-4 text-blue-400">User Profile</h2>
-              <p className="flex items-center gap-2"><User size={18} /> <strong>Username:</strong> {authUser.username}</p>
-              <p className="flex items-center gap-2"><Package size={18} /> <strong>Role:</strong> {authUser.role}</p>
-              {authUser.role === 'user' && (
-                <>
-                  <p className="flex items-center gap-2"><CreditCard size={18} /> <strong>Credits:</strong> {authUser.balance}</p>
-                  <p className="flex items-center gap-2"><Package size={18} /> <strong>Current Plan:</strong> {authUser.plan || 'FREE'}</p>
-                </>
+            <div className='flex gap-5 flex-wrap flex-row'>
+
+              <div className="bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-700 w-full max-w-md">
+                <h2 className="text-xl font-bold mb-4 text-blue-400">User Profile</h2>
+                <p className="flex items-center gap-2"><User size={18} /> <strong>Username:</strong> {authUser.username}</p>
+                <p className="flex items-center gap-2"><Package size={18} /> <strong>Role:</strong> {authUser.role}</p>
+                {authUser.role === 'user' && (
+                  <>
+                    <p className="flex items-center gap-2"><CreditCard size={18} /> <strong>Credits:</strong> {authUser.balance}</p>
+                    <p className="flex items-center gap-2"><Package size={18} /> <strong>Current Plan:</strong> {authUser.plan || 'FREE'}</p>
+                  </>
+                )}
+              </div>
+              {authUser.role === 'user' && authUser.name != 'FREE' && (
+                <div className="bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-700 w-full max-w-md">
+                  {!currentPlanDetailsLoading ? (
+                    <>
+                      <h2 className="text-xl font-bold mb-4 text-blue-400">User Current Plan</h2>
+
+                      <p className="flex items-center gap-2">
+                        <strong className="text-gray-400">Name:</strong> {currentPlanDetails?.plan.name}
+                      </p>
+
+                      <p className="flex items-center gap-2">
+                        <strong className="text-gray-400">Credits Per Month:</strong> {currentPlanDetails?.plan.creditsPerMonth}
+                      </p>
+
+                      <p className="flex items-center gap-2">
+                        <strong className="text-gray-400">Balance:</strong> {currentPlanDetails?.balance}
+                      </p>
+
+                      <p className="flex items-center gap-2">
+                        <strong className="text-gray-400">Description:</strong> {currentPlanDetails?.plan.description}
+                      </p>
+
+                      <p className="flex items-center gap-2">
+                        <strong className="text-gray-400">PlanType:</strong> {currentPlanDetails?.plan.planType}
+                      </p>
+
+                      <p>
+                        <strong className="text-gray-400">Plan start date:</strong> {dayjs(currentPlanDetails?.plan_start_date).format('YYYY-MM-DD HH:mm')}
+                      </p>
+
+                      <p className="flex items-center gap-2">
+                        <strong className="text-gray-400">Price:</strong> {currentPlanDetails?.plan.price}$
+                      </p>
+
+                      <h2 className="text-xl font-bold mt-4 text-blue-400">Transaction Details</h2>
+
+                      <p className="flex items-center gap-2">
+                        <strong className="text-gray-400">Status:</strong> {currentPlanDetails?.transaction.status}
+                      </p>
+
+                      <p className="flex items-center gap-2">
+                        <strong className="text-gray-400">Plan Method:</strong> {currentPlanDetails?.transaction.paymentMethod}
+                      </p>
+
+                      <p className="flex items-center gap-2">
+                        <strong className="text-gray-400">PaypalOrderId:</strong> {currentPlanDetails?.transaction.paypalOrderId}
+                      </p>
+
+                      <p>
+                        <strong className="text-gray-400">Created Date:</strong> {dayjs(currentPlanDetails?.createdAt).format('YYYY-MM-DD HH:mm')}
+                      </p>
+
+                      <p className="flex items-center gap-2">
+                        <strong className="text-gray-400">Currency:</strong> {currentPlanDetails?.transaction.currency}
+                      </p>
+
+                  
+                      <button
+                                onClick={() => handleRequestForRefand(currentPlanDetails)}
+                                className="flex flex-row items-center justify-center bg-blue-500 hover:bg-blue-600 transition text-white px-3 py-2 rounded w-full mt-5"
+                              >
+                                {refundRequestPending && (
+                                  <ClipLoader size={16} color="#fff" />
+                                )}
+                                <span className="pl-1">
+                                 Request For Refand
+                                </span>
+                              </button>
+                    </>
+
+                  ) : <div className='flex justify-center items-center h-full'><ClipLoader color='#fff' size={25} /></div>}
+
+                </div>
               )}
+
+
             </div>
 
 
@@ -175,20 +289,20 @@ export default function ProfilePage() {
                         </span>
 
                         {authUser.plan == plan.name ? (
-                         <div>
-                           <button
-                            disabled
-                            className="bg-gray-600 text-gray-400 px-3 py-1 rounded cursor-not-allowed w-full"
-                          >
-                            Current Plan
-                          </button>
-                          <button
-                            disabled
-                            className="bg-gray-600 text-gray-400 px-3 py-1 rounded cursor-not-allowed w-full mt-5"
-                          >
-                            Subscribe Plan
-                          </button>
-                         </div>
+                          <div>
+                            <button
+                              disabled
+                              className="bg-gray-600 text-gray-400 px-3 py-1 rounded cursor-not-allowed w-full"
+                            >
+                              Current Plan
+                            </button>
+                            <button
+                              disabled
+                              className="bg-gray-600 text-gray-400 px-3 py-1 rounded cursor-not-allowed w-full mt-5"
+                            >
+                              Subscribe Plan
+                            </button>
+                          </div>
                         ) : (
                           authUser.role === 'user' && (
                             <div>
@@ -214,7 +328,7 @@ export default function ProfilePage() {
                                   <ClipLoader size={16} color="#fff" />
                                 )}
                                 <span className="pl-1">
-                                 Subscribe Plan
+                                  Subscribe Plan
                                 </span>
                               </button>
                             </div>

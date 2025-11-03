@@ -22,7 +22,8 @@ const userMiddleware = async (req, res, next) => {
             username: user.username,
             role: user.role,
             balance: user.balance,
-            plan: user.plan
+            plan: user.plan,
+            plan_start_date: user.plan_start_date,
         }; 
         next();
     } catch (err) {

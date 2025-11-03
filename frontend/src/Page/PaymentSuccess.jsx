@@ -21,7 +21,7 @@ export default function PaymentSuccess() {
 
 
 
-    if (mode === "order") {
+    if (mode === "orders") {
       if (!token || !payerID) {
         setError('Missing token or PayerID in query params.');
         setLoading(false);
@@ -48,7 +48,10 @@ export default function PaymentSuccess() {
         });
     } else if (mode === "subscriptions") {
       console.log("succuss")
-      navigate('/');
+      setTimeout(() => {
+        navigate('/');
+      }, 6000);
+
     }
 
 

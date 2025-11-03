@@ -3,7 +3,7 @@ import {cancelPayPalOrder, completePayPalOrder, createPayPalOrder} from "../Cont
 import authMiddleware from "../Middleware/authMiddleware.js";
 import adminMiddleware from "../Middleware/adminMiddleware.js";
 import userMiddleware from "../Middleware/userMiddleware.js";
-import { createBillingPlan, getAllBillingPlans, getBillingPlanDetails, updateBillingPlan, createPlanSubscription, deactivateBillingPlan} from "../Controller/planController.js";
+import { createBillingPlan, getAllBillingPlans, getBillingPlanDetails, updateBillingPlan, createPlanSubscription, deactivateBillingPlan, refundAndCancelSubcription} from "../Controller/planController.js";
 
 const paypalRoutes = express.Router();
 
@@ -22,9 +22,12 @@ paypalRoutes.put('/plans/deactivate/:planId', adminMiddleware, deactivateBilling
 paypalRoutes.get('/plans', authMiddleware, getAllBillingPlans)
 paypalRoutes.get('/plans/:planId', authMiddleware, getBillingPlanDetails)
 
+// refund
+paypalRoutes.post('/refund/approve', adminMiddleware, refundAndCancelSubcription);
 
 // Subsription
 paypalRoutes.post('/subscriptions/:planId',userMiddleware , createPlanSubscription)
+
 
 export default paypalRoutes;
 

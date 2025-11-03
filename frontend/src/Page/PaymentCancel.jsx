@@ -17,7 +17,7 @@ export default function PaymentCancel() {
 
 
 
-    if (mode === "order") {
+    if (mode === "orders") {
       if (!token) {
         setError('Missing token in query params.');
         setLoading(false);
@@ -45,6 +45,7 @@ export default function PaymentCancel() {
 
     } else if (mode === "subscriptions") {
       console.log("failed")
+      navigate('/')
     }
 
 

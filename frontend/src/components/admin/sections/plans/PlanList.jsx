@@ -59,7 +59,7 @@ export default function PlanList({ setMode, setSelectedPlan }) {
               {plan.isActive ? 'Active' : 'Inactive'}
             </span>
 
-            <div className="flex gap-3">
+            {/* <div className="flex gap-3">
               <button
                 onClick={() => {
                   setSelectedPlan(plan);
@@ -75,7 +75,7 @@ export default function PlanList({ setMode, setSelectedPlan }) {
               >
                 Delete
               </button>
-            </div>
+            </div> */}
           </div>
         ))
       )}

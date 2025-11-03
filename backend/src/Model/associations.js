@@ -4,6 +4,7 @@ import Purchase from './purchase.js';
 import Notification from './Notification.js';
 import Plan from './Plan.js';
 import Transaction from './Transaction.js';
+import Refund from './Refund.js';
 
 
 // ----------------------
@@ -49,11 +50,23 @@ User.hasMany(Transaction, { foreignKey: "userId", onDelete: "CASCADE" });
 Transaction.belongsTo(User, { foreignKey: "userId" });
 
 
-
 // ----------------------
 // Plan ↔ Transaction
 // ----------------------
 Plan.hasMany(Transaction, { foreignKey: "planId", onDelete: "CASCADE" });
 Transaction.belongsTo(Plan, { foreignKey: "planId" });
+
+
+User.hasMany(Refund, {foreignKey: "userId", onDelete: "CASCADE"});
+Refund.belongsTo(User, {foreignKey: "userId" })
+
+Plan.hasMany(Refund, {foreignKey: "planId", onDelete: "CASCADE"});
+Refund.belongsTo(Plan, {foreignKey: "planId" })
+
+Transaction.hasMany(Refund, {foreignKey: "transactionId", onDelete: "CASCADE"});
+Refund.belongsTo(Transaction, {foreignKey: "transactionId" })
+
+
+
 
 export { Product, Purchase, User, Notification, Transaction, Plan };

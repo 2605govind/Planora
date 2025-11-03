@@ -1,5 +1,9 @@
-import Product from "../Model/Product.js";
+import Transaction from "../Model/Transaction.js";
 import { MyError } from "../utils/customError.js";
+import Product from "../Model/Product.js";
+import Refund from "../Model/Refund.js";
+import User from "../Model/User.js";
+
 
 
 //post= /api/admin/products  { name, price, inventory_count }
@@ -88,6 +92,59 @@ export const deleteProduct = async (req, res, next) => {
         return next(new MyError("Internal Server Error", 500));
     }
 };
+
+
+export const getAllTransaction = async (req, res, next) => {
+    try {
+        const transactions = await Transaction.findAll({
+            where: { status: "COMPLETED" }
+        });
+
+        // if (!transactions) return next(new MyError("transactions not found", 400));
+        console.log("sfslf")
+
+        return res.status(200).json({
+            success: true,
+            message: "All Transactions",
+            transactions
+        });
+
+    } catch (error) {
+        console.log("Error at getAllTransaction controller:", error.message);
+        return next(new MyError("Internal Server Error", 500));
+    }
+};
+
+
+
+
+export const getAllPandingRefundRequest = async (req, res, next) => {
+    try {
+        const request = await Refund.findAll({
+            where: { status: "PENDING" },
+            order: [['createdAt', 'ASC']],
+            include: [
+                {
+                    model: User,
+                    attributes: ["id", "username", "plan", "balance", "plan_start_date"] 
+                }
+            ]
+        });
+
+        if (!request) return next(new MyError("Refund request not found", 400));
+
+        return res.status(200).json({
+            success: true,
+            message: "All Refund Request",
+            data: request
+        });
+
+    } catch (error) {
+        console.log("Error at getAllTransaction controller:", error.message);
+        return next(new MyError("Internal Server Error", 500));
+    }
+};
+
 
 
 

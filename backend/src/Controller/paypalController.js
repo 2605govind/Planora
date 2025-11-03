@@ -1,7 +1,7 @@
 import Plan from "../Model/Plan.js";
 import User from "../Model/User.js";
 import Transaction from "../Model/Transaction.js";
-import { createOrder, verifyWebhookSignature } from "../services/planService.js";
+import { capturePayment, createOrder, verifyWebhookSignature } from "../services/planService.js";
 
 export const createPayPalOrder = async (req, res) => {
   try {
@@ -20,6 +20,7 @@ export const createPayPalOrder = async (req, res) => {
       amount: plan.price,
       status: "PENDING",
       paypalOrderId: order.id,
+      paymentMethod: 'orders'
     });
 
     res.json({ id: order.id, links: order.links });
@@ -95,11 +96,11 @@ export const handlePayPalWebhook = async (req, res) => {
     const body = JSON.parse(rawBody.toString("utf8"));
     const { event_type, resource } = body;
 
-    if (event_type === "CHECKOUT.ORDER.APPROVED") {
+    if (event_type === "CHECKOUT.ORDER.APPROVED" || event_type === "BILLING.SUBSCRIPTION.ACTIVATED") {
       const orderId = resource.id;
       const payerEmail = resource?.payer?.email_address;
 
-      const transaction = await Transaction.findOne({where: { paypalOrderId: orderId }});
+      const transaction = await Transaction.findOne({ where: { paypalOrderId: orderId } });
 
       if (!transaction) {
         console.log("Transaction not found:", orderId);
@@ -115,14 +116,26 @@ export const handlePayPalWebhook = async (req, res) => {
       if (user && plan) {
         user.plan = plan.name;
         user.balance = plan.creditsPerMonth;
+        // user.plan_start_date = Date.now();
         await user.save();
       }
 
       const pendingtransactions = await Transaction.destroy({
         where: { userId: user.id, status: 'PENDING' }
       });
-      
+
       console.log(`webhook ${payerEmail} upgraded to ${plan.name}`);
+    }
+
+
+    switch (event_type) {
+      case "BILLING.SUBSCRIPTION.ACTIVATED":
+        console.log("Subscription Activated:", resource.id);
+
+        break;
+      case "BILLING.SUBSCRIPTION.CANCELLED":
+        console.log("Subscription Cancelled:", resource.id);
+        break;
     }
 
     res.sendStatus(200);

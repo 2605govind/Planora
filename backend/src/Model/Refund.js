@@ -1,9 +1,9 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from '../config/dg.js'
 
-export default class Transaction extends Model {}
+export default class Refund extends Model {}
 
-Transaction.init(
+Refund.init(
   {
     id: {
       type: DataTypes.UUID,
@@ -22,7 +22,13 @@ Transaction.init(
       references: { model: "plans", key: "id" },
       onDelete: "CASCADE",
     },
-    paypalOrderId: {
+    transactionId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: { model: "transactions", key: "id" },
+      onDelete: "CASCADE",
+    },
+    orderId: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -30,22 +36,18 @@ Transaction.init(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    currency: {
+    paymentMethod: {
       type: DataTypes.STRING,
-      defaultValue: "USD",
     },
     status: {
       type: DataTypes.ENUM("PENDING", "COMPLETED", "FAILED"),
       defaultValue: "PENDING",
     },
-    paymentMethod: {
-      type: DataTypes.STRING,
-    },
   },
   {
     sequelize,
-    modelName: "Transaction",
-    tableName: "transactions",
+    modelName: "Refund",
+    tableName: "refunds",
     timestamps: true,
   }
 );

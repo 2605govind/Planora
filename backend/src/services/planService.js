@@ -199,7 +199,7 @@ export async function createBillingPlanService(plan) {
 export async function createPlanSubscriptionService(planId) {
   const token = await generateAccessToken();
   const body = {
-    plan_id: planId, 
+    plan_id: planId,
     application_context: {
       brand_name: "planora.io",
       user_action: "SUBSCRIBE_NOW",
@@ -245,7 +245,7 @@ export async function listSubscriptionService(body) {
   const token = await generateAccessToken();
 
   const res = axios({
-    url: `${BASE}v1/billing/subscriptions`,
+    url: `${BASE}/v1/billing/subscriptions`,
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -300,3 +300,39 @@ export async function listSubscriptionService(body) {
 }
 
 
+
+
+
+
+
+// refund 
+export async function getOrderDetails(orderId) {
+  const token = await generateAccessToken();
+  const orderRes = await axios({
+    method: "get",
+    url: `${BASE}/v2/checkout/orders/${orderId}`,
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  const captureId = orderRes?.data.purchase_units[0].payments.captures[0].id;
+  return captureId;
+}
+
+export async function RefuldTheCapture(captureId, price) {
+  const token = await generateAccessToken();
+
+  const refundRes = await axios({
+      method: "post",
+      url: `${BASE}/v2/payments/captures/${captureId}/refund`,
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      data: {
+        amount: { value: price, currency_code: "USD" },
+        note_to_payer: "Refund by order ID"
+      }
+    });
+}

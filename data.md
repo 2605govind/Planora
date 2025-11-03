@@ -35,6 +35,20 @@
 
 
 
+Create a webhook for plan billing and update the user's balance.
+Create an API to get the current plan details of the logged-in user and display all important fields.
+Create hooks for GET and POST requests using React Query.
+Implement a refund functionality where users can submit refund requests. All refund requests should be viewable by the admin, who can then approve or cancel them.
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,6 +1,6 @@
 import express from 'express';
 import userMiddleware from '../Middleware/userMiddleware.js';
-import { purchaseProduct, getAllPurchase } from '../Controller/userController.js';
+import { purchaseProduct, getAllPurchase, getCurrentPlanDetails, MakeRequestForRefund } from '../Controller/userController.js';
 import authMiddleware from '../Middleware/authMiddleware.js';
 
 const userRouter = express.Router();
@@ -15,5 +15,12 @@ userRouter.get('/',authMiddleware, (req, res) => {
 });
 
 userRouter.get('/allpurchase', userMiddleware, getAllPurchase)
+
+userRouter.get('/plans/details', userMiddleware, getCurrentPlanDetails);
+
+
+userRouter.post('/requestforrefund', userMiddleware, MakeRequestForRefund);
+
+
 
 export default userRouter;

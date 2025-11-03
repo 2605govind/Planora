@@ -1,9 +1,11 @@
 import sequelize from '../config/dg.js';
 import Notification from '../Model/Notification.js'
 import Product from '../Model/Product.js'
-import Purchase from '../Model/Purchase.js'
 import Plan from '../Model/Plan.js'
 import Transaction from '../Model/Transaction.js';
+import Purchase from '../Model/purchase.js';
+import Refund from '../Model/Refund.js';
+
 
 
 async function syncDB() {

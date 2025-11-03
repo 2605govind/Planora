@@ -1,12 +1,14 @@
-import { Home, Box, CreditCard } from 'lucide-react';
+import { Home, Box, CreditCard, BadgeDollarSign , BanknoteArrowDown  } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Sidebar({ activeSection, setActiveSection }) {
   const navigate = useNavigate();
   
   const sections = [
-    { name: 'products', icon: Box },
-    { name: 'plans', icon: CreditCard },
+    { name: 'Products', icon: Box },
+    { name: 'Plans', icon: CreditCard },
+    { name: 'Transactions', icon: BadgeDollarSign  },
+    { name: 'Refund Requests', icon: BanknoteArrowDown   },
   ];
 
   return (
@@ -16,7 +18,7 @@ export default function Sidebar({ activeSection, setActiveSection }) {
         {sections.map(({ name, icon: Icon }) => (
           <button
             key={name}
-            onClick={() => setActiveSection(name)}
+            onClick={() => setActiveSection(name.toLowerCase())}
             className={`flex items-center gap-2 p-3 text-left hover:bg-gray-700 w-full ${
               activeSection === name ? 'bg-gray-700' : ''
             }`}

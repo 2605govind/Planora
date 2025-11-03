@@ -1,6 +1,6 @@
 import Transaction from '../Model/Transaction.js'
 import Plan from '../Model/Plan.js';
-import { createBillingPlanService, createPlanSubscriptionService, deactivatePlanService, showBillingPlanDetailsService } from '../services/planService.js';
+import { createBillingPlanService, createPlanSubscriptionService, deactivatePlanService, getOrderDetails, RefuldTheCapture, showBillingPlanDetailsService } from '../services/planService.js';
 
 // create plan in paypal /admin
 export const createBillingPlan = async (req, res) => {
@@ -160,6 +160,7 @@ export const createPlanSubscription = async (req, res) => {
       amount: req.body.price,
       status: "PENDING",
       paypalOrderId: data.id,
+      paymentMethod: "subscriptions"
     });
 
     res.status(201).json({
@@ -248,3 +249,29 @@ export const deactivatePlan = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
+
+
+
+export const refundAndCancelSubcription = async (req, res) => {
+
+  try {
+    const {OrderId, amount} = req.body;
+
+    
+
+    const captureId =  await getOrderDetails(OrderId)
+
+    // const captureResponse = await RefuldTheCapture(captureId, amount)
+
+    res.status(200).json({ message: 'Refund successfully', captureId });
+  } catch (error) {
+    console.log('refundAndCancelSubcription Error:', error);
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+};
+
+
+
+
+
+
