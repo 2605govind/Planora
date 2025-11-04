@@ -26,6 +26,10 @@ Transaction.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    OrderCapturesId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     amount: {
       type: DataTypes.FLOAT,
       allowNull: false,

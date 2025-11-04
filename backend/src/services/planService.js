@@ -225,6 +225,8 @@ export async function createPlanSubscriptionService(planId) {
 }
 
 
+
+
 export async function deactivatePlanService(planId) {
   const token = await generateAccessToken();
 
@@ -320,19 +322,22 @@ export async function getOrderDetails(orderId) {
   return captureId;
 }
 
-export async function RefuldTheCapture(captureId, price) {
+export async function RefuldTheCapture(captureId, price, originalOrderId) {
   const token = await generateAccessToken();
 
   const refundRes = await axios({
-      method: "post",
-      url: `${BASE}/v2/payments/captures/${captureId}/refund`,
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      data: {
-        amount: { value: price, currency_code: "USD" },
-        note_to_payer: "Refund by order ID"
-      }
-    });
+    method: "post",
+    url: `${BASE}/v2/payments/captures/${captureId}/refund`,
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    data: {
+      amount: { value: price, currency_code: "USD" },
+      note_to_payer: "Refund by order ID",
+      invoice_id: originalOrderId, // ya custom_id
+    }
+  });
+
+  // return refundRes;
 }

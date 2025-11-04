@@ -97,7 +97,13 @@ export const deleteProduct = async (req, res, next) => {
 export const getAllTransaction = async (req, res, next) => {
     try {
         const transactions = await Transaction.findAll({
-            where: { status: "COMPLETED" }
+            where: { status: "COMPLETED" },
+            include: [
+                {
+                    model: User,
+                    attributes: ["id", "username", "plan", "balance", "plan_start_date"]
+                }
+            ]
         });
 
         // if (!transactions) return next(new MyError("transactions not found", 400));
@@ -126,7 +132,7 @@ export const getAllPandingRefundRequest = async (req, res, next) => {
             include: [
                 {
                     model: User,
-                    attributes: ["id", "username", "plan", "balance", "plan_start_date"] 
+                    attributes: ["id", "username", "plan", "balance", "plan_start_date"]
                 }
             ]
         });

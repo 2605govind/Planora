@@ -32,19 +32,43 @@ export default function RefundRequest() {
   }, [refundReqError, refundApproveError])
 
   function handleRefundApprove(refundReq) {
-    setSelectedId(refundReq.id)
-    const OrderId = refundReq.orderId;
-    const amount = refundReq.amount;
-    refundApproveMutate({ OrderId, amount })
-    console.log("handleRefundApprove", refundReq)
+    setSelectedId(refundReq.id);
+    const { orderId, amount, paymentMethod } = refundReq;
+    console.log("handleRefundApprove", refundReq);
 
-    // setSelectedId(null)
+    refundApproveMutate(
+      { orderId, amount, paymentMethod },
+      {
+        onSuccess: (response) => {
+          console.log("Refund request successfully approved");
+
+          // const intervalId = setInterval(async () => {
+          //   try {
+          //     const response = await axiosInstance('/api/user');
+          //     const data = response.data;
+
+          //     if (data?.user?.plan !== "diwali gift") {
+          //       clearInterval(intervalId);
+          //       console.log("User plan changed. Stopped polling.");
+          //     } else {
+          //       console.log("Still Diwali gift plan, checking again...");
+          //     }
+          //   } catch (error) {
+          //     console.error("Error fetching user data:", error);
+          //   }
+          // }, 1000); // every 1 second
+
+          toast.success("Refund request successfully approved");
+        },
+      }
+    );
   }
+
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-semibold text-blue-400">💳 All Refund Requests</h2>
+        <h2 className="text-xl font-semibold text-blue-400">All Refund Requests</h2>
         <button
           onClick={() => {
             refetch()
@@ -97,9 +121,9 @@ export default function RefundRequest() {
               <button
                 onClick={() => handleRefundApprove(refundReq)}
                 disabled={approvePanding}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-md transition-colors duration-200 mt-5"
+                className="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-md transition-colors duration-200 mt-5"
               >
-       
+
                 {selectedId === refundReq.id && approvePanding && (
                   <ClipLoader size={16} color="#fff" />
                 )}
@@ -111,7 +135,7 @@ export default function RefundRequest() {
           ))
         ) : (
           <div className="text-center text-gray-400 mt-16">
-            <p>No Refund Requests found 💤</p>
+            <p>No Refund Requests found</p>
           </div>
         )}
       </div>

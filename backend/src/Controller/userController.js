@@ -183,3 +183,35 @@ export const MakeRequestForRefund = async (req, res, next) => {
     }
 }
 
+
+export const getAllRefundRequest = async (req, res, next) => {
+    try {
+
+        const refundReq = await Refund.findAll({
+            where: {userId: req.user.id},
+            include: [
+               {
+                model: Plan,
+                attributes: ["name"]
+               }
+            ]
+        })
+
+        if(!refundReq) {
+            throw new MyError("No refund request", 400)
+        }
+
+        refundReq.User = req.user;
+
+        return res.status(200).json({
+            success: true,
+            message: "Successfully get all refund",
+            data: refundReq
+        });
+
+    } catch (error) {
+        console.log("Error at getAllRefundRequest controller:", error.message);
+        next(error);
+    }
+}
+

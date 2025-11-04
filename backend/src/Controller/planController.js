@@ -255,15 +255,28 @@ export const deactivatePlan = async (req, res) => {
 export const refundAndCancelSubcription = async (req, res) => {
 
   try {
-    const {OrderId, amount} = req.body;
+    const {orderId, amount, paymentMethod} = req.body;
 
+    if(paymentMethod === "orders") {
+      const result = await Transaction.findOne({
+        where: {paypalOrderId: orderId}
+      })
+
+      // console.log("result", result)
+      
+      const captureResponse = await RefuldTheCapture(result.OrderCapturesId, amount, orderId)
+      
+      // console.log("captureResponse", captureResponse)
+
+      res.status(200).json({ message: 'Refund successfully'});
+      
+    }else if(paymentMethod === "subscriptions") {
+      // OrderId, amount
+    }
     
+    
+    res.status(200).json({ message: 'Refund successfully' });
 
-    const captureId =  await getOrderDetails(OrderId)
-
-    // const captureResponse = await RefuldTheCapture(captureId, amount)
-
-    res.status(200).json({ message: 'Refund successfully', captureId });
   } catch (error) {
     console.log('refundAndCancelSubcription Error:', error);
     res.status(500).json({ message: 'Server Error', error: error.message });

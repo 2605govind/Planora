@@ -1,6 +1,55 @@
 
 
 
+// sell DIGital ICon
+
+1. login and register jwt + validation + error message + moduler code + superb UI With Animation
+2. subscrition for member ship like silver gold diamond
+3. paypal order use for purchase products (product, orders, transactions, )
+
+
+
+4. implement marketplace paypal 
+
+payment method
+1. user create free seller account, per parchase cut charges like 2% platform fee for non subcribe user, if user have subscripition like silver and gold, he can view the content and manyfeatures and plateform fee will be zero so that user can purchase in less money
+
+
+esa kar sakte hai jo course hoga use koi ek create karega or koi bhi aake usme contribute kar skta hai jo creater hoga use acha lage to use kuch coin de skta hai 
+model contributions base user can contribute someone course so so that course jo bhi contribute kar rhega use poin milega initial or like dislike ka hoga user ko pasand aaya to like nhi to disline or disline se contributer ke coin down par use ek change milega ki jo contribute kiya hai use sahi karne ka galti thik karne ka
+
+subcription no add,, free + add show
+
+
+one video for how to use this software withough voice and with voice
+- speacking tool for reading 
+
+iska matalb jaisa me soch rha hu wesa abhi tak platform nhi hai jaha pe log aake kisi course me contribute kar skte hai or jo course creater hoga use sahi laga to wo add karega jisee system se auto generate hoke countibuter ko kuch coin milenge or koi us course ko ilke karta hai to un sab ko coin milenge jinhe contribute kiya hai or create ko bhi ??
+
+
+
+
+1. learning about SaaS LMS, gethare details for creating like schemas, roles, flow [10.00 to 12.00]
+2. learning about paypal marketplace, and Direct payments, Split payments [12.00 to 1.30]
+3. create webhook for updating user plan value after refund approve by amdin [2.15.00 to 4.00]
+4. create notification UI where user can see status of refund request and apis get all user refund paddinga and completed request [4.00 to 7.30]
+
+
+
+()
+
+1. Learn about SaaS LMS [10:00 AM – 12:00 PM]
+2. Learn about PayPal Marketplace, including Direct Payments and Split Payments [12:00 PM – 1:30 PM]
+3. Create a webhook to update the user’s plan after a refund is approved by the admin [2:15 PM – 4:00 PM]
+4. Create a notification UI where users can see the status of their refund requests, and implement APIs to get all pending and completed refund requests for the user [4:00 PM – 7:30 PM]
+
+
+
+
+
+
+
+
 1. Create a webhook for payment confirmation and update the user with their plan and credits.
 2. Create /paypal/pay, /paypal/complete-order, and /paypal/cancel-order APIs for payment processing.
 3. Create success and failure pages for PayPal transactions.
@@ -40,12 +89,24 @@ Create an API to get the current plan details of the logged-in user and display 
 Create hooks for GET and POST requests using React Query.
 Implement a refund functionality where users can submit refund requests. All refund requests should be viewable by the admin, who can then approve or cancel them.
 
+5. create api for show all complese transition with details admin can see 
+
+
+saas LMS
 
 
 
 
 
 
+
+
+APIs & SDKs
+PayPal Checkout API: Simple integration ke liye, users ko website/app par checkout button show karta hai.
+Orders API: Order create, capture aur authorize karne ke liye.
+Subscription API: Recurring payments (monthly/yearly) setup karne ke liye.
+Payouts API: Ek saath multiple recipients ko payment bhejne ke liye (Marketplace ke liye useful).
+Vault API: Card details securely save karne ke liye.
 
 
 

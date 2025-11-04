@@ -23,7 +23,7 @@ export default function PlanList({ setMode, setSelectedPlan }) {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
+    <div className="flex flex-wrap gap-6 p-4">
       {plans?.length === 0 ? (
         <p>No plans found</p>
       ) : (

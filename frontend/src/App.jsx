@@ -25,7 +25,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div>
-        <ToastContainer position="top-right" autoClose={3000} theme="dark" />
+        <ToastContainer position="top-right" autoClose={1000} theme="dark" />
         <Routes>
           <Route path='/register' element={isAuth ? <HomePage /> : <RegisterPage />}></Route>
           <Route path='/login' element={isAuth ? <HomePage /> : <LoginPage />}></Route>

@@ -2,6 +2,7 @@ import Plan from "../Model/Plan.js";
 import User from "../Model/User.js";
 import Transaction from "../Model/Transaction.js";
 import { capturePayment, createOrder, verifyWebhookSignature } from "../services/planService.js";
+import Refund from "../Model/Refund.js";
 
 export const createPayPalOrder = async (req, res) => {
   try {
@@ -81,7 +82,7 @@ export const completePayPalOrder = async (req, res) => {
 export const handlePayPalWebhook = async (req, res) => {
   try {
 
-    console.log("me chal rha hu")
+    console.log("webhook chal rha hu ")
     const rawBody = req.body;
 
     // verify karo
@@ -95,6 +96,8 @@ export const handlePayPalWebhook = async (req, res) => {
     // ab webhook event parse karo
     const body = JSON.parse(rawBody.toString("utf8"));
     const { event_type, resource } = body;
+
+    // console.log("meri body ", body );
 
     if (event_type === "CHECKOUT.ORDER.APPROVED" || event_type === "BILLING.SUBSCRIPTION.ACTIVATED") {
       const orderId = resource.id;
@@ -125,19 +128,43 @@ export const handlePayPalWebhook = async (req, res) => {
       });
 
       console.log(`webhook ${payerEmail} upgraded to ${plan.name}`);
+    }else if(event_type === "PAYMENT.CAPTURE.COMPLETED") {
+      // handle capture id
+      const orderId = resource.supplementary_data.related_ids.order_id;
+ 
+      const transaction = await Transaction.findOne({ where: { paypalOrderId: orderId } });
+      // console.log("resource.id", resource.id)
+      if(transaction) {
+        transaction.OrderCapturesId = resource.id;
+        await transaction.save();
+      }
+
+      // console.log("transaction", transaction)
+      console.log("BILLING.SUBSCRIPTION.ACTIVATED govind")
+    }else if(event_type === "PAYMENT.CAPTURE.REFUNDED") {
+      const orderId = resource.invoice_id;
+
+      const refundReq = await Refund.findOne({ where: { orderId: orderId } });
+
+      if (!refundReq) {
+        console.log("refundReq not found:", orderId);
+        return res.sendStatus(404);
+      }
+
+      refundReq.status = "COMPLETED";
+      await refundReq.save();
+
+      const user = await User.findByPk(refundReq.userId);
+      // const plan = await Plan.findByPk(refundReq.planId);
+
+      if (user ) {
+        user.plan = "FREE";
+        user.balance = 0;
+        user.plan_start_date = Date.now();
+        await user.save();
+      }
     }
-
-
-    switch (event_type) {
-      case "BILLING.SUBSCRIPTION.ACTIVATED":
-        console.log("Subscription Activated:", resource.id);
-
-        break;
-      case "BILLING.SUBSCRIPTION.CANCELLED":
-        console.log("Subscription Cancelled:", resource.id);
-        break;
-    }
-
+   
     res.sendStatus(200);
   } catch (err) {
     console.error("Webhook Error:", err.response?.data || err.message);

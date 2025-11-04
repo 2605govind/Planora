@@ -23,7 +23,7 @@ export default function Transactions() {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-semibold text-blue-400">💳 All Transactions</h2>
+        <h2 className="text-3xl font-semibold text-blue-400">All Transactions</h2>
         <button
           onClick={() => {
             refetch()
@@ -48,7 +48,7 @@ export default function Transactions() {
             >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-lg font-semibold text-blue-400">
-                  #{index + 1} — {transaction?.paymentMethod?.toUpperCase()}
+                  #{index + 1} {transaction?.paymentMethod?.toUpperCase()}
                 </h3>
                 <span
                   className={`px-3 py-1 text-sm rounded-full font-medium 
@@ -64,15 +64,15 @@ export default function Transactions() {
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
-                <p><strong className="text-gray-400">User ID:</strong> {transaction?.userId}</p>
-                <p><strong className="text-gray-400">Amount:</strong> {transaction?.amount} {transaction?.currency}</p>
+                <p><strong className="text-gray-400">Username:</strong> {transaction?.User.username}</p>
+                <p><strong className="text-gray-400">Price:</strong> {transaction?.amount} {transaction?.currency}</p>
                 <p><strong className="text-gray-400">Date:</strong> {dayjs(transaction?.createdAt).format('YYYY-MM-DD HH:mm')}</p>
               </div>
             </div>
           ))
         ) : (
           <div className="text-center text-gray-400 mt-16">
-            <p>No transactions found 💤</p>
+            <p>No transactions found</p>
           </div>
         )}
       </div>
