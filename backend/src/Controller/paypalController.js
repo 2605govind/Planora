@@ -1,7 +1,7 @@
 import Plan from "../Model/Plan.js";
 import User from "../Model/User.js";
 import Transaction from "../Model/Transaction.js";
-import { capturePayment, createOrder, verifyWebhookSignature } from "../services/planService.js";
+import { capturePayment, createOrder, sendPayout, verifyWebhookSignature } from "../services/planService.js";
 import Refund from "../Model/Refund.js";
 
 export const createPayPalOrder = async (req, res) => {
@@ -71,6 +71,17 @@ export const completePayPalOrder = async (req, res) => {
   try {
     const response = await capturePayment(req.query.token)
 
+    const sellerEmail = response.payer.email_address
+    const amount = Number(response.purchase_units[0].payments.captures[0].amount.value) - 10.00;
+
+
+    console.log("response", response)
+    // send money to
+    console.log(sellerEmail, amount)
+    const payOutRes = await sendPayout(String(amount), sellerEmail)
+
+    console.log("payOutRes", payOutRes)
+    
     res.json({ message: 'Purchased successfully', data: response });
   } catch (error) {
     res.send('Error: ' + error)

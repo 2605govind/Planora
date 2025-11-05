@@ -21,7 +21,6 @@ export async function generateAccessToken() {
 }
 
 export async function createOrder(amount) {
-  // console.log("amount typeof  "+  typeof amount)
   const token = await generateAccessToken();
   const res = await axios.post(
     `${BASE}/v2/checkout/orders`,
@@ -44,9 +43,7 @@ export async function createOrder(amount) {
 }
 
 export async function capturePayment(orderId) {
-  // console.log("capturepaymeet   ", orderId);
   const accessToken = await generateAccessToken()
-
   const response = await axios({
     url: BASE + `/v2/checkout/orders/${orderId}/capture`,
     method: 'post',
@@ -340,4 +337,44 @@ export async function RefuldTheCapture(captureId, price, originalOrderId) {
   });
 
   // return refundRes;
+}
+
+
+
+export async function sendPayout(amount, sellerEmail) {
+  const token = await generateAccessToken();
+  const response = await axios({
+    url: `${BASE}/v1/payments/payouts`,
+    method: "post",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    data: {
+      sender_batch_header: {
+        sender_batch_id: `batch_${Date.now()}`,
+        email_subject: "You’ve got a payout!",
+      },
+      items: [
+        {
+          recipient_type: "EMAIL",
+          amount: {
+            value: amount,
+            currency: "USD",
+          },
+          receiver: sellerEmail,
+          note: "Your commission payout from MyStore",
+        },
+        {
+          recipient_type: "EMAIL", // required
+          amount: { value: amount, currency: "USD" }, // required
+          receiver: sellerEmail, // required
+          sender_item_id: "item_001", // required
+        },
+      ],
+
+    },
+  });
+
+  return response.data;
 }

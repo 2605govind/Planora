@@ -38,13 +38,13 @@ export default function PlanList({ setMode, setSelectedPlan }) {
               </div>
             )}
 
-            <h2 className="text-2xl font-semibold text-white">{plan.name}</h2>
+            <h2 className="text-2xl font-semibold text-white">{plan.name[0].toUpperCase()+plan.name.slice(1)}</h2>
 
             <p className="text-3xl font-bold text-red-500 my-3">
               ${plan.price} <span className="text-lg text-gray-500">/month</span>
             </p>
 
-            <p className="text-gray-600 text-sm mb-2">
+            <p className="text-gray-400 text-sm mb-2">
               {plan.creditsPerMonth} credits per month
             </p>
 

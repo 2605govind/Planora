@@ -1,5 +1,5 @@
-
-
+https://www.youtube.com/watch?v=2XF-HgauItk // make this website 
+https://www.youtube.com/watch?v=zA9r5zTllx4
 
 // sell DIGital ICon
 
@@ -44,9 +44,14 @@ iska matalb jaisa me soch rha hu wesa abhi tak platform nhi hai jaha pe log aake
 4. Create a notification UI where users can see the status of their refund requests, and implement APIs to get all pending and completed refund requests for the user [4:00 PM – 7:30 PM]
 
 
+05/11/2025
+1. learn how to implement paypal marketplace
+2. learn about PayPal payouts
+3. revision of all main concept in react, lazy loading (suspense) Async components handled without blocking UI
 
 
 
+payouts = PayPal Payouts API tumhe ek hi API call me multiple recipients ko payment bhejne
 
 
 
@@ -112,6 +117,13 @@ Vault API: Card details securely save karne ke liye.
 
 
 
+
+<!-- flow of react  -->
+JSX → Virtual DOM → Fiber Tree → Reconciliation → Commit Phase → Real DOM
+            ↑
+         Hooks State
+            ↑
+         Suspense Lazy
 
 
 
