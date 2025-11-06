@@ -6,7 +6,9 @@ import bcrypt from "bcrypt";
 export async function register(body) {
     try{
         const {name, email, password} = body;
-        const hash = await bcrypt.hash(password, process.env.BCRYPT_SALT_ROUNDS);
+        
+        const BCRYPT_SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || "10") 
+        const hash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
         const user = await sequelize.transaction(async (t) => {
             const u = await User.create({
                 name,

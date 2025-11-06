@@ -1,14 +1,10 @@
 import express from 'express';
 import 'dotenv/config'
-import sequelize from './config/dg.js'
-import authRouter from './Routers/authRouter.js';
-import publicRouter from './Routers/publicRouter.js';
-import adminRouter from './Routers/adminRouter.js';
-import userRouter from './Routers/userRouter.js';
+import {sequelize} from './config/db.js'
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import bodyParser from "body-parser";
-
+import authRoutes from './routes/auth.routes.js';
+import ErrorMiddleware from './middlewares/error-middleware.js'
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -25,26 +21,15 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// auth
-app.use('/api/auth', authRouter)
-app.use('/api/admin', adminRouter);
-app.use('/api/user', userRouter);
-app.use('/api', publicRouter)
 
-
-app.use((err, req, res, next) => {
-  // console.error('Error:', err.message);
-
-  res.status(err.statusCode || 500).json({ 
-    success: false,
-    message: err.message || 'Internal Server Error',
-  });
-})
+app.use('/api/auth', authRoutes)
 
 app.get('/', (req, res) => {
   res.send("Server is running at port 5005");
 });
 
+
+app.use(ErrorMiddleware);
 
 (async function ServerStart() {
   try {

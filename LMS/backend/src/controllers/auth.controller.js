@@ -1,12 +1,32 @@
+import { AppError } from "../utils/app-error.js";
+import { registerSchema } from "../validators/auth-validator.js";
+import {register} from '../services/auth.service.js'
 
 
-
-
-export const registerUser = (req, res, next) => {
+export const registerUser = async (req, res, next) => {
     try{
-        const {name, email, password, role="learner"} = req.body;
 
-        
+        const parse = registerSchema.safeParse(req.body);
+        if(!parse.success) {
+            const message = parsed.error.errors?.[0]?.message || "Invalid input";
+            next(new AppError(message, 404))
+        }
+
+        const user = await register(parse.data);
+
+
+        // create and set token
+        const token = createJWTToken(playload);
+        setJWTToken(token, res);
+
+        res.status(201).json({
+            success: true,
+            message: "user register successfuly.",
+            result: {
+                user
+            } 
+        })
+
     }catch(e) {
         next(e)
     }
