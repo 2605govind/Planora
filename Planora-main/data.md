@@ -45,10 +45,10 @@ iska matalb jaisa me soch rha hu wesa abhi tak platform nhi hai jaha pe log aake
 
 
 05/11/2025
-1. learn how to implement paypal marketplace
-2. learn about PayPal payouts
-3. revision of all main concept in react, lazy loading (suspense) Async components handled without blocking UI
-
+1. Learn how to implement PayPal Marketplace.
+2. Study and implement PayPal Payouts.
+3. Revise all the main concepts in React.
+4. Gather requirements for the SaaS LMS project.
 
 
 payouts = PayPal Payouts API tumhe ek hi API call me multiple recipients ko payment bhejne
