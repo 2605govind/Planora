@@ -22,9 +22,17 @@ Junior Full Stack Developer
 
 
 
+06-11-2025
+1. Collect all schemas and their relationships, and create a complete database with all necessary columns and attributes for the tables. [10.00 AM - 01.45 PM]
+2. Create the complete folder structure for the LMS project. [02.30 PM - 5.00 PM]
+3. Develop the registration route with transaction-based handling to prevent race conditions. [04.15 PM - 7.30 PM]
 
 
-
+07-11-2025
+1. Create a Login API with proper error handling and validation mechanisms. [10.00 AM - 12.00 PM]
+2. Study and understand message queues and explore the BullMQ.js library for task processing. [12.00 PM - 01.30 PM]
+3. Develop an OTP send service and implement the corresponding API for user authentication. [2.15 PM - 05.00 PM]
+4. Install Docker and set it up within the project environment for containerization and deployment. [05.15 PM - 07.30 PM]
 
 
 

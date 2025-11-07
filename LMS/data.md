@@ -83,3 +83,16 @@ Naming conventions (quick)
 | **404** | Not Found             | Resource doesn’t exist        |
 | **409** | Conflict              | Duplicate / version conflict  |
 | **500** | Internal Server Error | Something broke on server     |
+
+
+// message queue FIFO
+// 1. order me email send karete hai 
+2. notification system (bahut use hota hai)
+3. event push in queue, worker one by one take and execute
+4. automation
+5. producer jo queue me push krta hai   
+6. worker jo queue ko process krta hai
+
+- dead letter queue (error queue)
+- bull MQ library (queue ko handle karti hai)
+

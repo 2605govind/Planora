@@ -1,9 +1,9 @@
 import express from 'express';
 import {
   registerUser,
-  // loginUser,
-  // verifyEmail,
-  // resendOtp,
+  loginUser,
+  verifyOTP,
+  resendOtp,
   // forgotPassword,
   // resetPassword
 } from '../controllers/auth.controller.js';
@@ -11,9 +11,9 @@ import {
 const authRoutes = express.Router();
 
 authRoutes.post('/register', registerUser);
-// authRoutes.post('/login', loginUser);
-// authRoutes.post('/verify-email', verifyEmail);
-// authRoutes.post('/resend-otp', resendOtp);
+authRoutes.post('/login', loginUser);
+authRoutes.post('/send-otp', resendOtp);
+authRoutes.post('/verify-otp', verifyOTP);
 // authRoutes.post('/forgot-password', forgotPassword);
 // authRoutes.post('/reset-password', resetPassword);
 

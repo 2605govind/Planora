@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import {sequelize} from '../config/db.js';
+import { sequelize } from '../config/db.js';
 
 class User extends Model { }
 
@@ -20,6 +20,10 @@ User.init({
     type: DataTypes.ENUM('admin', 'instructor', 'learner'),
     defaultValue: 'learner'
   },
+  gender: {
+    type: DataTypes.STRING,
+  },
+  
   profile_photo: DataTypes.STRING,
   bio: DataTypes.TEXT,
   social_links: DataTypes.JSON,
@@ -35,11 +39,43 @@ User.init({
     defaultValue: false,
   },
 
-  otp: DataTypes.STRING,
-  otpExpires: DataTypes.DATE,
+  // otp
+  otpHash: {
+    type: DataTypes.STRING(128),
+    allowNull: true,
+  },
+  otpExpiresAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  otpAttempts: {
+    type: DataTypes.SMALLINT.UNSIGNED,
+    allowNull: false,
+    defaultValue: 0,
+  },
+  otpLockedUntil: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  otpLastSentAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 
-  resetPasswordToken: DataTypes.STRING,
-  resetPasswordExpires: DataTypes.DATE,
+
+  // forgot
+  resetPasswordToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  resetPasswordExpires: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  resetPasswordAttempts: {
+    type: DataTypes.SMALLINT.UNSIGNED,
+    defaultValue: 0,
+  }
 
 }, {
   sequelize,
