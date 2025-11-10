@@ -1,7 +1,7 @@
-import { AppError } from "../utils/app-error.js";
-import { loginSchema, registerSchema } from "../validators/auth-validator.js";
-import {registerService, loginService, sendOTPService} from '../services/auth.service.js'
-import {createJWTToken, setJWTToken } from '../utils/jwt-token.js'
+import { AppError } from "../utils/app.error.js";
+import { loginSchema, newPasswordSchema, registerSchema } from "../validators/auth.validator.js";
+import {registerService, loginService, sendOTPService, verifyOTPService, forgotPasswordService, resetPasswordService} from '../services/auth.service.js'
+import {createJWTToken, setJWTToken } from '../utils/jwt.token.js'
 
 
 export const registerUser = async (req, res, next) => {
@@ -21,6 +21,7 @@ export const registerUser = async (req, res, next) => {
             role: user.role
         }
         const token = createJWTToken(playload);
+        console.log("token", token)
         setJWTToken(token, res);
 
         res.status(201).json({
@@ -32,7 +33,7 @@ export const registerUser = async (req, res, next) => {
         })
 
     }catch(e) {
-        console.log("Error at registerUser controller: ", e);
+        console.log("Error at registerUser controller: ", e.message);
         if (e.name == "SequelizeUniqueConstraintError") {
             next( new AppError("email not available", 409) );
         }
@@ -68,16 +69,16 @@ export const loginUser = async (req, res, next) => {
         })
 
     }catch(e) {
-        console.log("Error at loginUser controller: ", e);
+        console.log("Error at loginUser controller: ", e.message);
         next(e)
     }
 }
 
-export const resendOtp = async (req, res, next) => {
+export const sendOtp = async (req, res, next) => {
     try{
         const {id} = req.body;
 
-        const data = await sendOTPService();
+        const data = await sendOTPService(id);
      
         res.status(200).json({
             success: true,
@@ -88,27 +89,71 @@ export const resendOtp = async (req, res, next) => {
         })
 
     }catch(e) {
-        console.log("Error at loginUser controller: ", e);
+        console.log("Error at sendOtp controller: ", e.message);
         next(e)
     }
 }
 
 export const verifyOTP = async (req, res, next) => {
     try{
-        const {id} = req.body;
+        const {id , otp} = req.body;
 
-        const data = await sendOTPService();
+        const data = await verifyOTPService(otp, id);
      
         res.status(200).json({
             success: true,
-            message: "otp sent successfuly.",
+            message: "otp verified successfuly.",
             result: {
-                
+                data
             } 
         })
 
     }catch(e) {
-        console.log("Error at loginUser controller: ", e);
+        console.log("Error at verifyOTP controller: ", e.message);
+        next(e)
+    }
+}
+
+export const forgotPassword = async (req, res, next) => {
+    try{
+        const {email} = req.body;
+
+        await forgotPasswordService(email);
+     
+        res.status(200).json({
+            success: true,
+            message: "Forgot password email sent successfuly.",
+        })
+
+    }catch(e) {
+        console.log("Error at forgotPassword controller: ", e.message);
+        next(e)
+    }
+}
+
+// GET /forgot-password?token=abc123xyz&userId=12345    // body: newPassword
+export const resetPassword = async (req, res, next) => {
+    try{
+        const {token, userId } = req.query;
+
+        const parse = newPasswordSchema.safeParse(req.body);
+        if(!parse.success) {
+            console.log("newPasswordSchema", parse)
+            const message = parse.error.errors?.[0]?.message || "Invalid input";
+            throw new AppError(message, 400)
+        }
+
+        const {newPassword} = parse.data;
+
+        await resetPasswordService(userId, token, newPassword);
+     
+        res.status(200).json({
+            success: true,
+            message: "Password reset successfuly.",
+        })
+
+    }catch(e) {
+        console.log("Error at resetPassword controller: ", e.message);
         next(e)
     }
 }

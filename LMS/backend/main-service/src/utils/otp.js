@@ -1,10 +1,8 @@
 import crypto from "crypto";
+import { ENV } from "../config/env.js";
 
 const now = () => Date.now();
 
-const OTP_RESEND_COOLDOWN = Number(process.env.OTP_RESEND_COOLDOWN)
-const OTP_MAX_ATTEMPTS = Number(process.env.OTP_MAX_ATTEMPTS)
-const OTP_LOCK_DURATION = Number(process.env.OTP_LOCK_DURATION)
 
 export function generateNumericOTP(length = 6) {
     const max = 10 ** length;
@@ -22,14 +20,14 @@ export function isOTPLocked(user) {
 }
 
 export function canResendOTP(user) {
-    return !user.otpLastSentAt || now() - user.otpLastSentAt.getTime() >= OTP_RESEND_COOLDOWN;
+    return !user.otpLastSentAt || now() - user.otpLastSentAt.getTime() >= ENV.OTP_RESEND_COOLDOWN;
 }
 
 
 export function registerOTPLocked(user) {
   user.otpAttempts = (user.otpAttempts || 0) + 1;
-  if (user.otpAttempts >= OTP_MAX_ATTEMPTS) {
-    user.otpLockedUntil = now() + OTP_LOCK_DURATION;
+  if (user.otpAttempts >= ENV.OTP_MAX_ATTEMPTS) {
+    user.otpLockedUntil = now() + ENV.OTP_LOCK_DURATION;
   }
 }
 
@@ -40,6 +38,6 @@ export function resetOTPAttempts(user) {
 
 // for otp verification 
 export function isOTPExpired(user) {
-    return !user.otpExpiresAt || user.otpExpiresAt <= now();
+    return !user.otpExpiresAt || user.otpExpiresAt.getTime() <= now();
 }
 

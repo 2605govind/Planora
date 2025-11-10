@@ -1,45 +1,67 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/db.js';
 
-class User extends Model { }
+class User extends Model {}
 
 User.init({
   id: {
     type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true
+    defaultValue: DataTypes.UUIDV4, // Postgres UUID generation
+    primaryKey: true,
   },
-  name: DataTypes.STRING,
+  name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   email: {
     type: DataTypes.STRING,
     unique: true,
-    allowNull: false
+    allowNull: false,
+    validate: {
+      isEmail: true, 
+    },
   },
-  password: DataTypes.STRING,
+  password: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   role: {
     type: DataTypes.ENUM('admin', 'instructor', 'learner'),
-    defaultValue: 'learner'
+    allowNull: false,
+    defaultValue: 'learner',
   },
   gender: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM('male', 'female', 'other'), // Modern ENUM support
+    allowNull: true,
   },
-  
-  profile_photo: DataTypes.STRING,
-  bio: DataTypes.TEXT,
-  social_links: DataTypes.JSON,
-  learning_interests: DataTypes.JSON,
-
+  profile_photo: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  bio: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  social_links: {
+    type: DataTypes.JSONB, // Postgres JSONB for better performance
+    allowNull: true,
+  },
+  learning_interests: {
+    type: DataTypes.JSONB,
+    allowNull: true,
+  },
   isVerified: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false
+    allowNull: false,
+    defaultValue: false,
   },
-
   isOnboarded: {
     type: DataTypes.BOOLEAN,
+    allowNull: false,
     defaultValue: false,
   },
 
-  // otp
+  // OTP fields
   otpHash: {
     type: DataTypes.STRING(128),
     allowNull: true,
@@ -49,7 +71,7 @@ User.init({
     allowNull: true,
   },
   otpAttempts: {
-    type: DataTypes.SMALLINT.UNSIGNED,
+    type: DataTypes.SMALLINT,
     allowNull: false,
     defaultValue: 0,
   },
@@ -62,8 +84,7 @@ User.init({
     allowNull: true,
   },
 
-
-  // forgot
+  // Password reset
   resetPasswordToken: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -73,7 +94,8 @@ User.init({
     allowNull: true,
   },
   resetPasswordAttempts: {
-    type: DataTypes.SMALLINT.UNSIGNED,
+    type: DataTypes.SMALLINT,
+    allowNull: false,
     defaultValue: 0,
   }
 
@@ -81,7 +103,13 @@ User.init({
   sequelize,
   modelName: 'User',
   tableName: 'users',
-  timestamps: true
+  timestamps: true,
+  underscored: true, 
+  validate: {
+    emailNotEmpty() {
+      if (!this.email) throw new Error('Email cannot be empty');
+    }
+  }
 });
 
 export default User;

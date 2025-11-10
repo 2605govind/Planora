@@ -39,3 +39,14 @@ export const loginSchema = z.object({
     .string({ required_error: "password is required" })
     .max(90, "password is too long"),
 });
+
+export const newPasswordSchema = z.object({
+    password: z
+    .string({ required_error: "password is required" })
+    .min(6, "password must be at least 6 chars")
+    .max(90, "password is too long")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()~`+=_\-[\]{}|;:'",.<>?/\\])(?!.*\s).{6,20}$/,
+      "Password must contain uppercase, lowercase, number, and special character"
+    ),
+})

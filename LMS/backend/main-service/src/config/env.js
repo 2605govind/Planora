@@ -29,6 +29,13 @@ export const ENV = {
   OTP_EXP_MS: num(process.env.OTP_EXP_MS, 5 * 60 * 1000),
   OTP_RESEND_COOLDOWN: num(process.env.OTP_RESEND_COOLDOWN, 60 * 1000),
   OTP_LOCK_DURATION: num(process.env.OTP_LOCK_DURATION, 15 * 60 * 1000),
+  
+  // forgot
+  RESET_PASS_MAX_ATTEMPTS: num(process.env.RESET_PASS_MAX_ATTEMPTS,  20 * 60 * 1000),
+  RESET_PASS_RESEND_COOLDOWN: num(process.env.RESET_PASS_RESEND_COOLDOWN, 60 * 1000 ),
+  RESET_TOKEN_EXP_MS: num(process.env.RESET_TOKEN_EXP_MS, 5 * 60 * 1000),
+  PASSWORD_LOCK_DURATION: num(process.env.PASSWORD_LOCK_DURATION, 15 * 60 * 1000),
+  PASSWORD_RESET_URL: process.envPASSWORD_RESET_URL || "http://localhost:5173/forgot-password",
 
   // redis
   REDIS_URL: process.env.REDIS_URL || "redis://127.0.0.1:6379",

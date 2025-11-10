@@ -96,3 +96,26 @@ Naming conventions (quick)
 - dead letter queue (error queue)
 - bull MQ library (queue ko handle karti hai)
 
+
+
+
+
+// step by step:
+1. bullMQ: redis use karta hai queue banane ke liye
+- Queue => 
+    create: const myqueue = new Queue("queue ka name");
+    add: const job = await myqueue.add("name" {data})
+
+- Worker =>
+    create: const workername = new Worker("queue ka name dena jo bani hue hai", callback (job) => {}, connection)
+
+- connection: {
+        host: "127.0.0.1
+        port: 6379
+    }    
+
+- Worker callback me return karte hai toh wo ek event preform hota hai wo kab trigger huaa hai uske liye QueueEvents ka use karte hai
+    const eventverif = new QueueEvents('queue ka name");
+
+    -promise ke ander => eventverif.on("completed", ({jobId, returnValue}) => {if(jobId === completeJobId) resolve(returnValue)})
+    - for faild eventverif.on("failed", ({jobId, failed reason})) reject(new Error("messase"))
