@@ -11,7 +11,7 @@ export function generateNumericOTP(length = 6) {
 }
 
 export function hashOTP(otp) {
-    return crypto.createHmac("sha256", process.env.OTP_SECRET).update(otp).digest('hex');
+    return crypto.createHmac("sha256", process.env.OTP_SECRET).update(String(otp)).digest('hex');
 }
 
 export function isOTPLocked(user) {

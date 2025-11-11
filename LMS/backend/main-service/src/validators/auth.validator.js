@@ -41,7 +41,7 @@ export const loginSchema = z.object({
 });
 
 export const newPasswordSchema = z.object({
-    password: z
+    newPassword: z
     .string({ required_error: "password is required" })
     .min(6, "password must be at least 6 chars")
     .max(90, "password is too long")

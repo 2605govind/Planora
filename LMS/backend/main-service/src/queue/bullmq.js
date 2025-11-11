@@ -6,9 +6,9 @@ import {Queue, Worker } from 'bullmq'
 
 
 
-export const emailQueue = new Queue('email-queue');
+// export const emailQueue = new Queue('email-queue');
 
-export const passwordResetQueue = new Queue('password-reset-queue');
+// export const passwordResetQueue = new Queue('password-reset-queue');
 
 
 export {Queue, Worker};

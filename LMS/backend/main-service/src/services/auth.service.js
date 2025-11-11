@@ -2,9 +2,9 @@ import { sequelize } from '../config/db.js'
 import User from '../models/user.model.js'
 import { AppError } from '../utils/app.error.js'
 import bcrypt from "bcrypt";
-import { canResendOTP, generateNumericOTP, hashOTP, isOTPLocked } from '../utils/otp.js';
-import { emailQueue, passwordResetQueue } from '../queue/bullmq.js';
-import { generateResetPassToken, hasExceedForgotPassAttempts, isExpireResetPasswordToken, isForgotPasswordLocked } from '../utils/password.js';
+import { canResendOTP, generateNumericOTP, hashOTP, isOTPExpired, isOTPLocked } from '../utils/otp.js';
+// import { emailQueue, passwordResetQueue } from '../queue/bullmq.js';
+import { generateResetPassToken, getWaitingTimeForCooldown, hasExceedForgotPassAttempts, isExpireResetPasswordToken, isForgotPasswordCooldown, isForgotPasswordLocked } from '../utils/password.js';
 import { ENV } from '../config/env.js';
 
 export async function registerService(body) {
@@ -144,7 +144,7 @@ export async function verifyOTPService(otp, id) {
 
     user.otpHash = null;
     user.otpExpiresAt = null;
-    user.otpAttempts = null;
+    user.otpAttempts = 0;
     user.otpLockedUntil = null;
     user.otpLastSentAt = null;
 
@@ -213,17 +213,20 @@ export async function forgotPasswordService(email) {
 
     const url = `${ENV.PASSWORD_RESET_URL}?token=${token}&userId=${user.id}`
 
-     const addedEmail = await passwordResetQueue.add("password-reset-queue", {
+    const emailData = {
         to: user.email,
         template: 'reset password',
         url,
         expireTimeMin: Math.floor(ENV.RESET_TOKEN_EXP_MS / 60000)
-    }, {
-        jobId: `email:password:reset:${user.id}:${Date.now()}`,
-        removeOnComplete: true,
-    })
+    }
 
-    return { sendEmailId: addedEmail.id };
+    console.log(emailData);
+    //  const addedEmail = await passwordResetQueue.add("password-reset-queue", emailData , {
+    //     jobId: `email:password:reset:${user.id}:${Date.now()}`,
+    //     removeOnComplete: true,
+    // })
+
+    return { sendEmailId: "addedEmail.id" };
 
     /*
         1. check resetPasswordAttempts if less than maxiAttemp than (++attemp, createToken, setExpire)
@@ -259,7 +262,7 @@ export async function resetPasswordService(userId, token, newPassword) {
     user.resetPasswordToken = null;
     user.resetPasswordAttempts = 0;
     user.resetPasswordExpires = null;
-    user.password = await bcrypt.hash(password, ENV.BCRYPT_SALT_ROUNDS);
+    user.password = await bcrypt.hash(newPassword, ENV.BCRYPT_SALT_ROUNDS);
     
     await user.save();
 }

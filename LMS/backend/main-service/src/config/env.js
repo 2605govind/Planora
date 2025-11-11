@@ -35,7 +35,7 @@ export const ENV = {
   RESET_PASS_RESEND_COOLDOWN: num(process.env.RESET_PASS_RESEND_COOLDOWN, 60 * 1000 ),
   RESET_TOKEN_EXP_MS: num(process.env.RESET_TOKEN_EXP_MS, 5 * 60 * 1000),
   PASSWORD_LOCK_DURATION: num(process.env.PASSWORD_LOCK_DURATION, 15 * 60 * 1000),
-  PASSWORD_RESET_URL: process.envPASSWORD_RESET_URL || "http://localhost:5173/forgot-password",
+  PASSWORD_RESET_URL: process.envPASSWORD_RESET_URL || "http://localhost:5173/reset-password",
 
   // redis
   REDIS_URL: process.env.REDIS_URL || "redis://127.0.0.1:6379",

@@ -3,31 +3,22 @@ import crypto from 'crypto'
 
 
 export function hasExceedForgotPassAttempts(user) {
-    if(user.resetPasswordAttempts.getTime() >= ENV.RESET_PASS_MAX_ATTEMPTS) {
+    if(user.resetPasswordAttempts >= ENV.RESET_PASS_MAX_ATTEMPTS) {
         return true;
     }
     return false;
 }
 
 export function isForgotPasswordLocked(user) {
-    if((user.resetPasswordExpires.getTime() - ENV.RESET_TOKEN_EXP_MS) < ENV.PASSWORD_LOCK_DURATION) {
-        return true;
-    }
-    return false;
+    return user.resetPasswordExpires && ((user.resetPasswordExpires.getTime() - ENV.RESET_TOKEN_EXP_MS) < ENV.PASSWORD_LOCK_DURATION);
 }
 
 export function isForgotPasswordCooldown(user) {
-    if((user.resetPasswordExpires.getTime() - ENV.RESET_TOKEN_EXP_MS) < ENV.RESET_PASS_RESEND_COOLDOWN) {
-        return true;
-    }
-    return false;
+    return user.resetPasswordExpires && ((user.resetPasswordExpires.getTime() - ENV.RESET_TOKEN_EXP_MS) < ENV.RESET_PASS_RESEND_COOLDOWN) 
 }
 
 export function getWaitingTimeForCooldown(user) {
-    if(((user.resetPasswordExpires.getTime() - ENV.RESET_TOKEN_EXP_MS) +  ENV.RESET_PASS_RESEND_COOLDOWN - now())   / 1000) {
-        return true;
-    }
-    return false;
+    return user.resetPasswordExpires && (((user.resetPasswordExpires.getTime() - ENV.RESET_TOKEN_EXP_MS) +  ENV.RESET_PASS_RESEND_COOLDOWN - now())   / 1000) 
 }
 
 export function generateResetPassToken(length=10) {
@@ -35,9 +26,6 @@ export function generateResetPassToken(length=10) {
 }
 
 export function isExpireResetPasswordToken() {
-    if(user.resetPasswordExpires.getTime() >= ENV.RESET_TOKEN_EXP_MS) {
-        return true;
-    }
-    return false;
+    return user.resetPasswordExpires && (user.resetPasswordExpires.getTime() >= ENV.RESET_TOKEN_EXP_MS) 
 }
 

@@ -35,7 +35,7 @@ export const registerUser = async (req, res, next) => {
     }catch(e) {
         console.log("Error at registerUser controller: ", e.message);
         if (e.name == "SequelizeUniqueConstraintError") {
-            next( new AppError("email not available", 409) );
+            next( new AppError("Email is not available", 409) );
         }
         next(e)
     }
@@ -134,9 +134,9 @@ export const forgotPassword = async (req, res, next) => {
 // GET /forgot-password?token=abc123xyz&userId=12345    // body: newPassword
 export const resetPassword = async (req, res, next) => {
     try{
-        const {token, userId } = req.query;
+        const {token, userId } = req.body;
 
-        const parse = newPasswordSchema.safeParse(req.body);
+        const parse = newPasswordSchema.safeParse(req.body.newPassword);
         if(!parse.success) {
             console.log("newPasswordSchema", parse)
             const message = parse.error.errors?.[0]?.message || "Invalid input";

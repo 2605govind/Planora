@@ -21,9 +21,17 @@ Junior Full Stack Developer
 
 
 
+11-11-2025
+1. Understand how to identify slow SQL queries, optimize them for better performance, and enable query logging.
+2. Help Venus Task 5.1 related to Snapforms.
+3. Learn about user impersonation and how it works.
+4. Troubleshoot and resolve errors in the Send OTP and Forgot Password APIs.
+
 
 06-11-2025
 1. Collect all schemas and their relationships, and create a complete database with all necessary columns and attributes for the tables. [10.00 AM - 01.45 PM]
+
+
 2. Create the complete folder structure for the LMS project. [02.30 PM - 5.00 PM]
 3. Develop the registration route with transaction-based handling to prevent race conditions. [04.15 PM - 7.30 PM]
 
