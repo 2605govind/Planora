@@ -21,6 +21,14 @@ Junior Full Stack Developer
 
 
 
+12-11-2025
+1. Learn about AbortController and implement it.
+2. Create a login and registration UI, integrate API calls, and build a Docker container for sending OTPs and password reset links via an email service using a message queue.
+3. Gather requirements for a social media web application.
+4. Understand public and private keys for end-to-end encryption.
+
+
+
 11-11-2025
 1. Understand how to identify slow SQL queries, optimize them for better performance, and enable query logging.
 2. Help Venus Task 5.1 related to Snapforms.

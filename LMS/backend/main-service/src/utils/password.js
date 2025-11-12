@@ -25,7 +25,7 @@ export function generateResetPassToken(length=10) {
     return crypto.randomBytes(length*2).toString('hex');
 }
 
-export function isExpireResetPasswordToken() {
-    return user.resetPasswordExpires && (user.resetPasswordExpires.getTime() >= ENV.RESET_TOKEN_EXP_MS) 
+export function isExpireResetPasswordToken(user) {
+    return user.resetPasswordExpires && (user.resetPasswordExpires.getTime() >= new Date() + ENV.RESET_TOKEN_EXP_MS);
 }
 

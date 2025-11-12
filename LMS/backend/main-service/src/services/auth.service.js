@@ -3,7 +3,7 @@ import User from '../models/user.model.js'
 import { AppError } from '../utils/app.error.js'
 import bcrypt from "bcrypt";
 import { canResendOTP, generateNumericOTP, hashOTP, isOTPExpired, isOTPLocked } from '../utils/otp.js';
-// import { emailQueue, passwordResetQueue } from '../queue/bullmq.js';
+import { emailQueue, passwordResetQueue } from '../queue/bullmq.js';
 import { generateResetPassToken, getWaitingTimeForCooldown, hasExceedForgotPassAttempts, isExpireResetPasswordToken, isForgotPasswordCooldown, isForgotPasswordLocked } from '../utils/password.js';
 import { ENV } from '../config/env.js';
 
@@ -63,7 +63,6 @@ export async function loginService(data) {
 }
 
 export async function sendOTPService(id) {
-
     console.log("govind", id)
     const user = await User.findByPk(id);
 
@@ -110,12 +109,12 @@ export async function sendOTPService(id) {
     }
 
     console.log("emailData", emailData)
-    // const addedEmail = await emailQueue.add("email-queue", emailData, {
-    //     jobId: `email:otp:${user.id}:${Date.now()}`,
-    //     removeOnComplete: true,
-    // })
+    const addedEmail = await emailQueue.add("email-queue", emailData, {
+        jobId: `email-otp-${user.id}-${Date.now()}`,
+        removeOnComplete: true,
+    })
 
-    return { sendEmailId: user.id };
+    return { sendEmailId: addedEmail.id };
 }
 
 export async function verifyOTPService(otp, id) {
@@ -221,12 +220,12 @@ export async function forgotPasswordService(email) {
     }
 
     console.log(emailData);
-    //  const addedEmail = await passwordResetQueue.add("password-reset-queue", emailData , {
-    //     jobId: `email:password:reset:${user.id}:${Date.now()}`,
-    //     removeOnComplete: true,
-    // })
+     const addedEmail = await passwordResetQueue.add("password-reset-queue", emailData , {
+        jobId: `email-password-reset-${user.id}-${Date.now()}`,
+        removeOnComplete: true,
+    })
 
-    return { sendEmailId: "addedEmail.id" };
+    return { sendEmailId: addedEmail.id };
 
     /*
         1. check resetPasswordAttempts if less than maxiAttemp than (++attemp, createToken, setExpire)

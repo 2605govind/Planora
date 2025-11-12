@@ -1,13 +1,13 @@
 import { AppError } from "../utils/app.error.js";
-import { loginSchema, newPasswordSchema, registerSchema } from "../validators/auth.validator.js";
-import {registerService, loginService, sendOTPService, verifyOTPService, forgotPasswordService, resetPasswordService} from '../services/auth.service.js'
-import {createJWTToken, setJWTToken } from '../utils/jwt.token.js'
+import { forgotPasswordSchema, loginSchema, newPasswordSchema, registerSchema, sendOtpSchema, verifyOTPSchema } from "../validators/auth.validator.js";
+import { registerService, loginService, sendOTPService, verifyOTPService, forgotPasswordService, resetPasswordService } from '../services/auth.service.js'
+import { createJWTToken, setJWTToken } from '../utils/jwt.token.js'
 
 
 export const registerUser = async (req, res, next) => {
-    try{
+    try {
         const parse = registerSchema.safeParse(req.body);
-        if(!parse.success) {
+        if (!parse.success) {
             console.log("registerSchema", parse)
             const message = parse.error.errors?.[0]?.message || "Invalid input";
             throw new AppError(message, 400)
@@ -29,22 +29,22 @@ export const registerUser = async (req, res, next) => {
             message: "user register successfuly.",
             result: {
                 user
-            } 
+            }
         })
 
-    }catch(e) {
+    } catch (e) {
         console.log("Error at registerUser controller: ", e.message);
         if (e.name == "SequelizeUniqueConstraintError") {
-            next( new AppError("Email is not available", 409) );
+            next(new AppError("Email is not available", 409));
         }
         next(e)
     }
 }
 
 export const loginUser = async (req, res, next) => {
-    try{
+    try {
         const parse = loginSchema.safeParse(req.body);
-        if(!parse.success) {
+        if (!parse.success) {
             console.log("loginUser", parse)
             const message = parse.error.errors?.[0]?.message || "Invalid input";
             throw new AppError(message, 400)
@@ -65,21 +65,30 @@ export const loginUser = async (req, res, next) => {
             message: "user login successfuly.",
             result: {
                 user
-            } 
+            }
         })
 
-    }catch(e) {
+    } catch (e) {
         console.log("Error at loginUser controller: ", e.message);
         next(e)
     }
 }
 
 export const sendOtp = async (req, res, next) => {
-    try{
-        const {id} = req.body;
+    try {
 
+        const parse = sendOtpSchema.safeParse(req.body);
+        if (!parse.success) {
+            console.log("sendOtpSchema", parse)
+            const message = parse.error.errors?.[0]?.message || "Invalid input";
+            throw new AppError(message, 400)
+        }
+
+        const { id } = parse.data;
+
+        console.log("id", id);
         const data = await sendOTPService(id);
-     
+
         res.status(200).json({
             success: true,
             message: "otp sent successfuly.",
@@ -88,44 +97,60 @@ export const sendOtp = async (req, res, next) => {
             }
         })
 
-    }catch(e) {
+    } catch (e) {
         console.log("Error at sendOtp controller: ", e.message);
         next(e)
     }
 }
 
 export const verifyOTP = async (req, res, next) => {
-    try{
-        const {id , otp} = req.body;
+    try {
+        
+        const parse = verifyOTPSchema.safeParse(req.body);
+        if (!parse.success) {
+            console.log("verifyOTPSchema", parse)
+            const message = parse.error.errors?.[0]?.message || "Invalid input";
+            throw new AppError(message, 400)
+        }
+        
+        const { id, otp } = parse.data;
 
         const data = await verifyOTPService(otp, id);
-     
+
         res.status(200).json({
             success: true,
             message: "otp verified successfuly.",
             result: {
                 data
-            } 
+            }
         })
 
-    }catch(e) {
+    } catch (e) {
         console.log("Error at verifyOTP controller: ", e.message);
         next(e)
     }
 }
 
 export const forgotPassword = async (req, res, next) => {
-    try{
-        const {email} = req.body;
+    try {
+
+        const parse = forgotPasswordSchema.safeParse(req.body);
+        if (!parse.success) {
+            console.log("forgotPasswordSchema", parse)
+            const message = parse.error.errors?.[0]?.message || "Invalid input";
+            throw new AppError(message, 400)
+        }
+
+        const { email } = parse.data;
 
         await forgotPasswordService(email);
-     
+
         res.status(200).json({
             success: true,
             message: "Forgot password email sent successfuly.",
         })
 
-    }catch(e) {
+    } catch (e) {
         console.log("Error at forgotPassword controller: ", e.message);
         next(e)
     }
@@ -133,26 +158,24 @@ export const forgotPassword = async (req, res, next) => {
 
 // GET /forgot-password?token=abc123xyz&userId=12345    // body: newPassword
 export const resetPassword = async (req, res, next) => {
-    try{
-        const {token, userId } = req.body;
-
-        const parse = newPasswordSchema.safeParse(req.body.newPassword);
-        if(!parse.success) {
+    try {
+        const parse = newPasswordSchema.safeParse(req.body);
+        if (!parse.success) {
             console.log("newPasswordSchema", parse)
-            const message = parse.error.errors?.[0]?.message || "Invalid input";
+            const message = parse.error.ZodError?.[0]?.message || "Invalid input";
             throw new AppError(message, 400)
         }
 
-        const {newPassword} = parse.data;
+        const { newPassword, token, userId } = parse.data;
 
         await resetPasswordService(userId, token, newPassword);
-     
+
         res.status(200).json({
             success: true,
             message: "Password reset successfuly.",
         })
 
-    }catch(e) {
+    } catch (e) {
         console.log("Error at resetPassword controller: ", e.message);
         next(e)
     }
