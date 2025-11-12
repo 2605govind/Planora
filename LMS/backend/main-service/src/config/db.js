@@ -11,6 +11,9 @@ console.log("process.cwd()", process.cwd());
 const logStream = fs.createWriteStream(logFilePath, { flags: "a" })
 
 
+
+
+
 export const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
   benchmark: true,

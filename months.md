@@ -28,6 +28,13 @@ Junior Full Stack Developer
 4. Troubleshoot and resolve errors in the Send OTP and Forgot Password APIs.
 
 
+10-11-2025
+1. Understanding message queues in a microservices architecture. 
+2. Implementing an email service using a message queue to send OTP and reset password emails.  
+3. Creating APIs for sendOtp, verifyOTP, forgotPassword, and resetPassword.
+
+
+
 06-11-2025
 1. Collect all schemas and their relationships, and create a complete database with all necessary columns and attributes for the tables. [10.00 AM - 01.45 PM]
 
